@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Family Vault | Private Mobile Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- ПЕРЕМЕННЫЕ И ОСНОВА --- */
+        :root {
+            --primary: #00f2ff;
+            --primary-dark: #008a91;
+            --bg: #05080a;
+            --card-bg: rgba(20, 25, 30, 0.8);
+            --glass: rgba(255, 255, 255, 0.04);
+            --danger: #ff4757;
+            --success: #2ed573;
+            --text: #e0e0e0;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            position: fixed; /* Фикс для мобильного скролла */
+        }
+
+        /* --- ФОНОВЫЕ ЭФФЕКТЫ --- */
+        #stars-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+        }
+
+        /* --- ЭКРАНЫ --- */
+        .screen {
+            position: absolute; inset: 0;
+            display: none; flex-direction: column;
+            opacity: 0; transform: scale(1.05);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .screen.active {
+            display: flex; opacity: 1; transform: scale(1);
+        }
+
+        /* --- АВТОРИЗАЦИЯ --- */
+        #auth-screen {
+            justify-content: center; align-items: center;
+            padding: 30px;
+            background: radial-gradient(circle at center, #0a151d 0%, #05080a 100%);
+        }
+
+        .auth-container {
+            width: 100%; max-width: 380px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 40px 25px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        .logo-ring {
+            width: 100px; height: 100px; margin: 0 auto 30px;
+            border: 3px solid var(--primary);
+            border-radius: 35px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px var(--primary);
+            position: relative; overflow: hidden;
+        }
+        .logo-ring img { width: 100%; height: 100%; object-fit: cover; }
+
+        .auth-container h1 {
+            font-family: 'Orbitron', sans-serif; font-size: 22px;
+            letter-spacing: 4px; margin-bottom: 30px; color: var(--primary);
+        }
+
+        .input-style {
+            width: 100%; padding: 18px 25px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; color: #fff;
+            font-size: 16px; margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .input-style:focus { border-color: var(--primary); outline: none; background: rgba(0,0,0,0.6); }
+
+        .btn-glow {
+            width: 100%; padding: 18px; border: none;
+            border-radius: 20px; background: var(--primary);
+            color: #000; font-weight: 800; font-size: 16px;
+            text-transform: uppercase; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
+            transition: 0.3s;
+        }
+        .btn-glow:active { transform: scale(0.96); opacity: 0.8; }
+
+        /* --- ОСНОВНОЙ ИНТЕРФЕЙС --- */
+        header {
+            padding: calc(var(--safe-top) + 15px) 20px 15px;
+            background: rgba(10, 15, 20, 0.9);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 100;
+        }
+
+        .user-pill {
+            display: flex; align-items: center; gap: 12px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 15px 5px 6px; border-radius: 30px;
+        }
+        .user-pill img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--primary); }
+        .user-pill span { font-size: 14px; font-weight: 600; }
+
+        #chat-scroller {
+            flex: 1; overflow-y: auto;
+            padding: 20px; display: flex; flex-direction: column; gap: 20px;
+            background: linear-gradient(180deg, #05080a 0%, #0d141a 100%);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* --- СООБЩЕНИЯ --- */
+        .msg-row { display: flex; flex-direction: column; max-width: 85%; position: relative; }
+        .msg-row.own { align-self: flex-end; }
+        .msg-row.other { align-self: flex-start; }
+
+        .author-tag { font-size: 10px; font-weight: 800; text-transform: uppercase; margin: 0 10px 4px; opacity: 0.6; }
+        .own .author-tag { text-align: right; color: var(--primary); }
+
+        .bubble {
+            padding: 14px 18px; border-radius: 24px;
+            font-size: 15px; line-height: 1.5; color: #fff;
+            position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .own .bubble { background: linear-gradient(135deg, #0072ff, #00c6ff); border-bottom-right-radius: 4px; }
+        .other .bubble { background: #1e272e; border: 1px solid rgba(255,255,255,0.05); border-bottom-left-radius: 4px; }
+
+        /* МЕДИА */
+        .media-container { margin-top: 10px; position: relative; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); line-height: 0; }
+        .media-img { width: 100%; max-height: 300px; object-fit: cover; }
+        .media-video { width: 100%; max-height: 300px; }
+        
+        .voice-bar {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 5px; min-width: 180px;
+        }
+        .play-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); border: none; color: var(--primary);
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+
+        /* --- ПАНЕЛЬ ВВОДА --- */
+        .bottom-bar {
+            background: rgba(10, 15, 20, 0.98);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 15px calc(15px + var(--safe-bottom));
+            display: flex; align-items: center; gap: 10px;
+            z-index: 1000;
+        }
+
+        .circle-btn {
+            width: 52px; height: 52px; border-radius: 50%;
+            border: none; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0; transition: 0.2s;
+        }
+        .btn-attach { background: #1e272e; color: #fff; }
+        .btn-mic { background: #1e272e; color: var(--danger); }
+        .btn-mic.active { background: var(--danger); color: #fff; animation: pulse 1.5s infinite; }
+        .btn-send { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(0, 242, 255, 0.4); }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .msg-input {
+            flex: 1; background: #000; border: 1px solid rgba(255,255,255,0.15);
+            padding: 15px 20px; border-radius: 30px; color: #fff; font-size: 16px;
+        }
+
+        /* --- МОДАЛКА ПРЕДПРОСМОТРА --- */
+        #preview-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 9999; display: none; flex-direction: column;
+            padding: var(--safe-top) 20px var(--safe-bottom);
+        }
+        #preview-content { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .preview-actions { display: flex; gap: 20px; padding: 30px 0; }
+        .btn-cancel { background: #333; color: #fff; flex: 1; }
+        .btn-confirm { background: var(--success); color: #000; flex: 1; }
+
+        /* --- МЕНЮ ФАЙЛОВ --- */
+        #media-picker {
+            position: absolute; bottom: 100px; left: 15px;
+            background: #1e272e; border-radius: 25px;
+            padding: 10px; display: none; flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 2000;
+        }
+        .picker-item {
+            padding: 15px 25px; display: flex; align-items: center; gap: 15px;
+            color: #fff; font-weight: 600; font-size: 15px;
+        }
+        .picker-item i { color: var(--primary); width: 20px; }
+
+        /* --- ЗАГРУЗКА --- */
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: #111; z-index: 10001; display: none;
+        }
+        #load-bar { height: 100%; width: 0%; background: var(--primary); transition: 0.1s; box-shadow: 0 0 10px var(--primary); }
+
+        /* АДМИН ПАНЕЛЬ */
+        #admin-view {
+            position: fixed; inset: 0; background: #05080a; z-index: 5000;
+            display: none; flex-direction: column; padding: var(--safe-top) 20px;
+        }
+        .req-card {
+            background: var(--glass); padding: 15px; border-radius: 20px;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="stars-canvas"></canvas>
+    <div class="loading-overlay"><div id="load-bar"></div></div>
+
+    <div id="auth-screen" class="screen active">
+        <div class="auth-container">
+            <div class="logo-ring" id="avatar-trigger" onclick="document.getElementById('ava-input').click()">
+                <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Family" id="preview-ava">
+                <div style="position:absolute; bottom:0; width:100%; background:rgba(0,0,0,0.5); font-size:10px; padding:2px 0;">ИЗМЕНИТЬ</div>
+            </div>
+            <input type="file" id="ava-input" hidden accept="image/*" onchange="loadAva(event)">
+            <h1>VAULT V5.0</h1>
+            <input type="text" id="login-name" class="input-style" placeholder="Ваш позывной...">
+            <div id="admin-key-box" style="display: none;">
+                <input type="password" id="login-pass" class="input-style" placeholder="Мастер-ключ">
+            </div>
+            <button class="btn-glow" onclick="startLogin()">ПОДТВЕРДИТЬ</button>
+        </div>
+    </div>
+
+    <div id="wait-screen" class="screen">
+        <div style="margin: auto; text-align: center; padding: 40px;">
+            <i class="fas fa-user-shield" style="font-size: 80px; color: var(--primary); margin-bottom: 30px;"></i>
+            <h2 style="font-family: 'Orbitron';">ПРОВЕРКА ДОСТУПА</h2>
+            <p style="opacity: 0.6; line-height: 1.6;">Запрос отправлен администратору (Денису). Ожидайте авторизации...</p>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--danger); margin-top:30px;">ОТМЕНА</button>
+        </div>
+    </div>
+
+    <div id="main-screen" class="screen">
+        <header>
+            <div class="user-pill">
+                <img src="" id="h-ava">
+                <span id="h-name">Family Vault</span>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button id="admin-btn" style="display:none; background:none; border:1px solid gold; color:gold; border-radius:10px; padding:5px 10px;" onclick="toggleAdmin(true)">ADMIN</button>
+                <i class="fas fa-power-off" style="font-size: 22px; opacity: 0.5;" onclick="logout()"></i>
+            </div>
+        </header>
+
+        <div id="chat-scroller"></div>
+
+        <div id="typing-box" style="padding: 5px 25px; font-size: 11px; color: var(--primary); opacity: 0;">Кто-то печатает...</div>
+
+        <div id="media-picker">
+            <div class="picker-item" onclick="openMedia('image/*', false)"><i class="fas fa-images"></i> ГАЛЕРЕЯ</div>
+            <div class="picker-item" onclick="openMedia('image/*', true)"><i class="fas fa-camera"></i> КАМЕРА</div>
+            <div class="picker-item" onclick="openMedia('video/*', true)"><i class="fas fa-video"></i> ВИДЕО</div>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="circle-btn btn-attach" onclick="togglePicker()"><i class="fas fa-plus"></i></button>
+            <input type="text" id="msg-in" class="msg-input" placeholder="Сообщение..." oninput="sendTyping()">
+            <button class="circle-btn btn-mic" id="mic-node" onclick="handleVoice()"><i class="fas fa-microphone"></i></button>
+            <button class="circle-btn btn-send" onclick="submitText()"><i class="fas fa-arrow-up"></i></button>
+        </div>
+
+        <input type="file" id="hidden-file-input" hidden onchange="handleFileSelect(event)">
+    </div>
+
+    <div id="preview-modal">
+        <h3 style="text-align: center; font-family: 'Orbitron'; color: var(--primary);">ПОДТВЕРДИТЬ ОТПРАВКУ?</h3>
+        <div id="preview-content"></div>
+        <div class="preview-actions">
+            <button class="btn-glow btn-cancel" onclick="closePreview()">ОТМЕНА</button>
+            <button class="btn-glow btn-confirm" id="send-media-confirm">ОТПРАВИТЬ</button>
+        </div>
+    </div>
+
+    <div id="admin-view">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px;">
+            <h2 style="font-family: 'Orbitron'; color: gold;">УПРАВЛЕНИЕ</h2>
+            <i class="fas fa-times" style="font-size: 24px;" onclick="toggleAdmin(false)"></i>
+        </div>
+        <div id="requests-list"></div>
+        <hr style="opacity: 0.1; width: 100%;">
+        <button class="btn-glow" style="background: var(--danger); color: #fff;" onclick="clearHistory()">ОЧИСТИТЬ ЧАТ (ВСЕ)</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+
+    <script>
+        // --- 1. КОНФИГУРАЦИЯ ---
+        const config = {
+            apiKey: "AIzaSyACp_gVvnpgF_P_0YpKXR5E8QeSTcLEA88",
+            authDomain: "familychat-4125b.firebaseapp.com",
+            projectId: "familychat-4125b",
+            storageBucket: "familychat-4125b.appspot.com",
+            messagingSenderId: "558123147956",
+            appId: "1:558123147956:web:313a729de8d6dff4fa2de1"
+        };
+
+        firebase.initializeApp(config);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        const MASTER_NAME = "Денис";
+        const MASTER_PASS = "qwaszx12";
+
+        let userState = {
+            name: localStorage.getItem('v5_name') || "",
+            avatar: localStorage.getItem('v5_ava') || "",
+            isAdmin: false
+        };
+
+        let currentBlob = null;
+        let currentType = "";
+        let recorder = null;
+        let audioChunks = [];
+
+        // --- 2. ИНИЦИАЛИЗАЦИЯ ---
+        window.onload = () => {
+            initStars();
+            if(userState.name) checkUserStatus();
+            
+            document.getElementById('login-name').oninput = (e) => {
+                document.getElementById('admin-key-box').style.display = 
+                    (e.target.value.trim().toLowerCase() === MASTER_NAME.toLowerCase()) ? 'block' : 'none';
+            };
+        };
+
+        // --- 3. ЛОГИКА АВТОРИЗАЦИИ ---
+        function loadAva(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.src = ev.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 150; canvas.height = 150;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, 150, 150);
+                    userState.avatar = canvas.toDataURL('image/jpeg', 0.8);
+                    document.getElementById('preview-ava').src = userState.avatar;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function startLogin() {
+            const name = document.getElementById('login-name').value.trim();
+            if(!name) return alert("Введите имя");
+
+            if(name.toLowerCase() === MASTER_NAME.toLowerCase()) {
+                const pass = document.getElementById('login-pass').value;
+                if(pass !== MASTER_PASS) return alert("Неверный ключ");
+            }
+
+            userState.name = name;
+            if(!userState.avatar) userState.avatar = document.getElementById('preview-ava').src;
+            
+            localStorage.setItem('v5_name', name);
+            localStorage.setItem('v5_ava', userState.avatar);
+
+            const userRef = db.collection("v5_users").doc(name);
+            const doc = await userRef.get();
+            if(!doc.exists) {
+                await userRef.set({
+                    name: name,
+                    ava: userState.avatar,
+                    approved: (name.toLowerCase() === MASTER_NAME.toLowerCase()),
+                    typing: false
+                });
+            }
+            checkUserStatus();
+        }
+
+        function checkUserStatus() {
+            db.collection("v5_users").doc(userState.name).onSnapshot(doc => {
+                if(!doc.exists) return logout();
+                const data = doc.data();
+                
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                
+                if(data.approved) {
+                    document.getElementById('main-screen').classList.add('active');
+                    runChat();
+                } else {
+                    document.getElementById('wait-screen').classList.add('active');
+                }
+            });
+        }
+
+        // --- 4. РАБОТА ЧАТА ---
+        function runChat() {
+            document.getElementById('h-ava').src = userState.avatar;
+            document.getElementById('h-name').innerText = userState.name;
+            
+            if(userState.name.toLowerCase() === MASTER_NAME.toLowerCase()) {
+                userState.isAdmin = true;
+                document.getElementById('admin-btn').style.display = 'block';
+                loadRequests();
+            }
+
+            listenMsgs();
+            listenTyping();
+        }
+
+        function togglePicker() {
+            const p = document.getElementById('media-picker');
+            p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function openMedia(type, useCam) {
+            const input = document.getElementById('hidden-file-input');
+            input.accept = type;
+            if(useCam) input.setAttribute('capture', 'environment');
+            else input.removeAttribute('capture');
+            input.click();
+            togglePicker();
+        }
+
+        // --- 5. ОБРАБОТКА МЕДИА (Фикс для Телефона) ---
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            currentBlob = file;
+            currentType = file.type.split('/')[0]; // 'image' или 'video'
+            showPreview(URL.createObjectURL(file), currentType);
+        }
+
+        function showPreview(src, type) {
+            const modal = document.getElementById('preview-modal');
+            const container = document.getElementById('preview-content');
+            container.innerHTML = "";
+
+            if(type === 'image') {
+                container.innerHTML = `<img src="${src}" style="max-width:100%; max-height:100%; border-radius:15px;">`;
+            } else if(type === 'video') {
+                container.innerHTML = `<video src="${src}" controls style="max-width:100%; max-height:100%; border-radius:15px;"></video>`;
+            } else if(type === 'audio') {
+                container.innerHTML = `
+                    <div style="text-align:center;">
+                        <i class="fas fa-microphone" style="font-size:60px; color:var(--primary);"></i>
+                        <p>Голосовое сообщение готово</p>
+                        <audio src="${src}" controls></audio>
+                    </div>`;
+            }
+
+            modal.style.display = 'flex';
+            document.getElementById('send-media-confirm').onclick = () => uploadCurrentFile();
+        }
+
+        function closePreview() {
+            document.getElementById('preview-modal').style.display = 'none';
+            currentBlob = null;
+        }
+
+        async function uploadCurrentFile() {
+            const file = currentBlob;
+            const type = currentType;
+            closePreview();
+
+            const overlay = document.querySelector('.loading-overlay');
+            const bar = document.getElementById('load-bar');
+            overlay.style.display = 'block';
+
+            const path = `v5_vault/${Date.now()}_${userState.name}`;
+            const ref = storage.ref().child(path);
+            const task = ref.put(file);
+
+            task.on('state_changed', 
+                s => bar.style.width = (s.bytesTransferred / s.totalBytes * 100) + "%",
+                e => alert("Ошибка загрузки. Проверь правила Firebase Storage"),
+                async () => {
+                    const url = await task.snapshot.ref.getDownloadURL();
+                    await db.collection("v5_msgs").add({
+                        user: userState.name,
+                        media: url,
+                        mediaType: type,
+                        time: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    overlay.style.display = 'none';
+                    bar.style.width = "0%";
+                }
+            );
+        }
+
+        // --- 6. ГОЛОСОВЫЕ СООБЩЕНИЯ ---
+        async function handleVoice() {
+            const btn = document.getElementById('mic-node');
+            
+            if(!recorder || recorder.state === 'inactive') {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    recorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    recorder.ondataavailable = e => audioChunks.push(e.data);
+                    recorder.onstop = () => {
+                        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                        currentBlob = blob;
+                        currentType = 'audio';
+                        showPreview(URL.createObjectURL(blob), 'audio');
+                    };
+
+                    recorder.start();
+                    btn.classList.add('active');
+                } catch(e) { alert("Микрофон недоступен"); }
+            } else {
+                recorder.stop();
+                btn.classList.remove('active');
+            }
+        }
+
+        // --- 7. ТЕКСТ И ОТОБРАЖЕНИЕ ---
+        async function submitText() {
+            const input = document.getElementById('msg-in');
+            const text = input.value.trim();
+            if(!text) return;
+
+            await db.collection("v5_msgs").add({
+                user: userState.name,
+                text: text,
+                time: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            input.value = "";
+            db.collection("v5_users").doc(userState.name).update({ typing: false });
+        }
+
+        function listenMsgs() {
+            db.collection("v5_msgs").orderBy("time", "asc").onSnapshot(snap => {
+                const box = document.getElementById('chat-scroller');
+                box.innerHTML = "";
+                
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    const isOwn = m.user === userState.name;
+                    
+                    let content = m.text ? `<div class="text-node">${m.text}</div>` : "";
+                    
+                    if(m.media) {
+                        if(m.mediaType === 'image') content += `<div class="media-container"><img class="media-img" src="${m.media}" onclick="window.open('${m.media}')"></div>`;
+                        if(m.mediaType === 'video') content += `<div class="media-container"><video class="media-video" src="${m.media}" controls></video></div>`;
+                        if(m.mediaType === 'audio') content += `
+                            <div class="voice-bar">
+                                <button class="play-btn" onclick="playVoice(this, '${m.media}')"><i class="fas fa-play"></i></button>
+                                <div style="height:2px; flex:1; background:rgba(255,255,255,0.1); border-radius:2px;"></div>
+                            </div>`;
+                    }
+
+                    box.innerHTML += `
+                        <div class="msg-row ${isOwn ? 'own' : 'other'}">
+                            <div class="author-tag">${m.user} ${m.user === MASTER_NAME ? '👑' : ''}</div>
+                            <div class="bubble">
+                                ${content}
+                                ${userState.isAdmin ? `<i class="fas fa-trash" style="font-size:10px; position:absolute; top:-15px; right:0; padding:5px; color:red;" onclick="delMsg('${doc.id}')"></i>` : ''}
+                            </div>
+                        </div>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function playVoice(btn, url) {
+            const aud = new Audio(url);
+            aud.play();
+            const icon = btn.querySelector('i');
+            icon.classList.replace('fa-play', 'fa-spinner');
+            icon.classList.add('fa-spin');
+            aud.onended = () => {
+                icon.classList.replace('fa-spinner', 'fa-play');
+                icon.classList.remove('fa-spin');
+            };
+        }
+
+        // --- 8. АДМИН-ФУНКЦИИ ---
+        function toggleAdmin(show) { document.getElementById('admin-view').style.display = show ? 'flex' : 'none'; }
+
+        function loadRequests() {
+            db.collection("v5_users").where("approved", "==", false).onSnapshot(snap => {
+                const list = document.getElementById('requests-list');
+                list.innerHTML = "<h4>ЗАПРОСЫ:</h4>";
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    list.innerHTML += `
+                        <div class="req-card">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <img src="${u.ava}" style="width:30px; height:30px; border-radius:50%;">
+                                <span>${u.name}</span>
+                            </div>
+                            <div>
+                                <button onclick="approveUser('${u.name}', true)" style="color:var(--success); background:none; border:none; margin-right:15px;"><i class="fas fa-check"></i></button>
+                                <button onclick="approveUser('${u.name}', false)" style="color:var(--danger); background:none; border:none;"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        async function approveUser(name, ok) {
+            if(ok) await db.collection("v5_users").doc(name).update({ approved: true });
+            else await db.collection("v5_users").doc(name).delete();
+        }
+
+        async function delMsg(id) { if(confirm("Удалить объект?")) await db.collection("v5_msgs").doc(id).delete(); }
+
+        async function clearHistory() {
+            if(!confirm("УДАЛИТЬ ВСЕ СООБЩЕНИЯ?")) return;
+            const snap = await db.collection("v5_msgs").get();
+            snap.forEach(d => d.ref.delete());
+        }
+
+        // --- 9. ВСПОМОГАТЕЛЬНОЕ ---
+        function sendTyping() {
+            db.collection("v5_users").doc(userState.name).update({ typing: true });
+            clearTimeout(window.typeTimer);
+            window.typeTimer = setTimeout(() => {
+                db.collection("v5_users").doc(userState.name).update({ typing: false });
+            }, 3000);
+        }
+
+        function listenTyping() {
+            db.collection("v5_users").where("typing", "==", true).onSnapshot(snap => {
+                const tBox = document.getElementById('typing-box');
+                let users = [];
+                snap.forEach(d => { if(d.id !== userState.name) users.push(d.id); });
+                tBox.style.opacity = users.length ? 1 : 0;
+                tBox.innerText = users.join(", ") + " печатает...";
+            });
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
+
+        function initStars() {
+            const c = document.getElementById('stars-canvas');
+            const ctx = c.getContext('2d');
+            c.width = window.innerWidth; c.height = window.innerHeight;
+            let p = [];
+            for(let i=0; i<40; i++) p.push({x:Math.random()*c.width, y:Math.random()*c.height, s:Math.random()*1.5, v:Math.random()*0.2});
+            function draw() {
+                ctx.clearRect(0,0,c.width,c.height);
+                ctx.fillStyle = "rgba(0, 242, 255, 0.4)";
+                p.forEach(s => {
+                    s.y -= s.v; if(s.y < 0) s.y = c.height;
+                    ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+    </script>
+</body>
+</html>
