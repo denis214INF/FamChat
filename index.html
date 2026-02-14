@@ -199,10 +199,14 @@
             <input type="file" id="media-input" hidden accept="image/*,video/*" onchange="sendMedia(event)">
             
             <div id="rec-status" class="recording-ui">REC</div>
-            <input type="text" id="msg-input" placeholder="Сообщение..." oninput="reportTyping()">
+            <input type="text" id="msg-input" placeholder="Сообщение..." oninput="reportTyping()" onkeypress="if(event.key==='Enter') sendData()">
+<button class="send-btn" onclick="sendData()">
+    <i class="fas fa-paper-plane"></i>
+</button>
             
-            <button id="voice-btn" class="media-btn" onclick="toggleVoice()"><i class="fas fa-microphone"></i></button>
-            <button class="send-btn" onclick="sendData()"><i class="fas fa-paper-plane"></i></button>
+	<button id="voice-btn" class="media-btn" onclick="toggleVoice()">
+    	<i class="fas fa-microphone"></i>
+	</button>
         </div>
     </div>
 
@@ -317,43 +321,49 @@
             reader.readAsDataURL(file);
         }
 
- async function toggleMic() {
-    const btn = document.getElementById('voice-btn'); // Проверь, что ID совпадает с кнопкой в HTML
+        // Используем то имя, которое у тебя в HTML (onclick="toggleVoice()")
+async function toggleVoice() {
+    const btn = document.getElementById('voice-btn'); 
     const status = document.getElementById('rec-status');
 
-    if(!recorder || recorder.state === "inactive") {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        
-        // КЛЮЧЕВОЙ МОМЕНТ: Выбор формата для iPhone/Android
-        let type = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-        
-        recorder = new MediaRecorder(stream, { mimeType: type });
-        audioChunks = [];
-        recorder.ondataavailable = e => audioChunks.push(e.data);
-        recorder.onstop = async () => {
-            const blob = new Blob(audioChunks, { type: type });
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = async () => {
-                const base64 = reader.result;
-                // Лимит базы данных (около 1 МБ)
-                if(base64.length < 1000000) {
-                    await db.collection("messages").add({ 
-                        user: session.name, 
-                        media: base64, 
-                        type: 'audio', 
-                        time: firebase.firestore.FieldValue.serverTimestamp() 
-                    });
-                } else { alert("Слишком длинная запись!"); }
+    if(!window.mediaRecorder || window.mediaRecorder.state === "inactive") {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            let type = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+            
+            window.mediaRecorder = new MediaRecorder(stream, { mimeType: type });
+            window.audioChunks = []; // Сделали глобальным через window
+
+            window.mediaRecorder.ondataavailable = e => window.audioChunks.push(e.data);
+            
+            window.mediaRecorder.onstop = async () => {
+                const blob = new Blob(window.audioChunks, { type: type });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = async () => {
+                    const base64 = reader.result;
+                    // Проверка на размер (Firebase Base64 лимит ~1mb)
+                    if(base64.length < 1048576) { 
+                        await db.collection("messages").add({ 
+                            user: session.name, 
+                            media: base64, 
+                            type: 'audio', 
+                            time: firebase.firestore.FieldValue.serverTimestamp() 
+                        });
+                    } else { alert("ГС слишком длинное, попробуй короче!"); }
+                };
+                stream.getTracks().forEach(t => t.stop());
             };
-            stream.getTracks().forEach(t => t.stop());
-        };
-        recorder.start();
-        status.style.display = "block";
-        btn.style.color = "red";
+
+            window.mediaRecorder.start();
+            if(status) status.style.display = "block";
+            btn.style.color = "red";
+        } catch (err) {
+            alert("Доступ к микрофону отклонен или не поддерживается.");
+        }
     } else {
-        recorder.stop();
-        status.style.display = "none";
+        window.mediaRecorder.stop();
+        if(status) status.style.display = "none";
         btn.style.color = "var(--primary)";
     }
 }
@@ -395,7 +405,7 @@
                     if(m.media) {
                         if(m.type === 'image') content = `<img src="${m.media}" onclick="window.open('${m.media}')">`;
                         else if(m.type === 'video') content = `<video src="${m.media}" controls></video>`;
-                        else if(m.type === 'audio') content = `<audio src="${m.media}" controls></audio>`;
+                        else if(m.type === 'audio') content = `<audio src="${m.media}" controls playsinline preload="metadata"></audio>`;
                     }
                     const html = `
                         <div class="msg-block ${isMe ? 'me' : 'others'}">
