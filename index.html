@@ -34,10 +34,8 @@
             overflow: hidden; position: fixed; 
         }
 
-        /* Анимированный фон (Сенсорные частицы) */
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.4; }
 
-        /* --- СКРЫТЫЕ ЭЛЕМЕНТЫ --- */
         .screen {
             position: absolute; inset: 0; display: none;
             flex-direction: column; opacity: 0; transition: opacity 0.4s ease;
@@ -57,10 +55,9 @@
             text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8);
         }
 
-        .logo-box { margin-bottom: 30px; }
         .logo-box h1 { 
             font-family: 'Orbitron', sans-serif; font-size: 22px; 
-            letter-spacing: 5px; color: var(--primary); margin: 0;
+            letter-spacing: 5px; color: var(--primary); margin: 0 0 30px;
             text-shadow: 0 0 15px var(--primary-glow);
         }
 
@@ -70,7 +67,6 @@
             object-fit: cover; border: 2px solid var(--glass-border);
             padding: 5px; transition: 0.3s;
         }
-        .avatar-selection:hover img { border-color: var(--primary); transform: scale(1.05); }
 
         .file-label {
             position: absolute; bottom: -5px; right: -5px;
@@ -85,23 +81,20 @@
             background: rgba(0,0,0,0.4); color: #fff; font-size: 16px; 
             font-family: inherit; transition: 0.3s; text-align: center;
         }
-        input:focus { border-color: var(--primary); background: rgba(0,0,0,0.6); }
 
         .btn-main {
             width: 100%; padding: 18px; border-radius: 20px; border: none;
             background: var(--primary); color: #000; font-weight: 800;
             font-size: 14px; letter-spacing: 2px; cursor: pointer;
             text-transform: uppercase; transition: 0.3s;
-            box-shadow: 0 10px 25px rgba(0, 242, 255, 0.2);
         }
-        .btn-main:active { transform: scale(0.96); }
 
-        /* --- 2. ЭКРАН ОЖИДАНИЯ (PENDING) --- */
+        /* --- 2. ЭКРАН ОЖИДАНИЯ --- */
         #pending-screen { justify-content: center; align-items: center; text-align: center; padding: 40px; }
         .wait-icon { font-size: 50px; color: var(--primary); margin-bottom: 25px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* --- 3. ГЛАВНЫЙ ЧАТ (APP) --- */
+        /* --- 3. ГЛАВНЫЙ ЧАТ --- */
         header {
             padding: calc(15px + var(--safe-top)) 20px 15px;
             background: rgba(5, 8, 10, 0.8); backdrop-filter: blur(20px);
@@ -117,81 +110,48 @@
         #chat-flow {
             flex: 1; overflow-y: auto; padding: 20px 15px;
             display: flex; flex-direction: column; gap: 15px;
-            background: radial-gradient(circle at top right, rgba(0, 242, 255, 0.03), transparent 40%);
         }
 
         /* Сообщения */
-        .msg-block { display: flex; flex-direction: column; max-width: 82%; position: relative; }
+        .msg-block { display: flex; flex-direction: column; max-width: 85%; position: relative; }
         .msg-block.me { align-self: flex-end; }
         .msg-block.others { align-self: flex-start; }
 
-        .msg-author { font-size: 10px; font-weight: 700; color: var(--text-dim); margin: 0 8px 4px; text-transform: uppercase; }
-        .me .msg-author { text-align: right; color: var(--primary); }
-
         .bubble {
-            padding: 14px 18px; border-radius: 24px; font-size: 15px; line-height: 1.5;
+            padding: 12px; border-radius: 20px; font-size: 15px; line-height: 1.5;
             position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        .me .bubble { 
-            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); color: #fff; 
-            border-bottom-right-radius: 4px;
-        }
-        .others .bubble { 
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-bottom-left-radius: 4px;
-        }
+        .me .bubble { background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); color: #fff; border-bottom-right-radius: 4px; }
+        .others .bubble { background: var(--glass-bg); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; }
 
-        .del-ico { 
-            position: absolute; top: -10px; right: -10px; background: var(--danger);
-            width: 20px; height: 20px; border-radius: 50%; font-size: 10px;
-            display: none; align-items: center; justify-content: center; cursor: pointer;
-        }
-        body.is-admin .del-ico { display: flex; }
+        /* Медиа в чате */
+        .bubble img, .bubble video { max-width: 100%; border-radius: 12px; display: block; }
+        .bubble audio { width: 200px; height: 40px; margin-top: 5px; }
 
         /* Ввод */
         .input-area {
-            padding: 15px 15px calc(20px + var(--safe-bottom));
-            background: rgba(10, 15, 20, 0.95); display: flex; gap: 12px; align-items: center;
+            padding: 10px 15px calc(15px + var(--safe-bottom));
+            background: rgba(10, 15, 20, 0.95); display: flex; gap: 8px; align-items: center;
         }
-        .input-area input { text-align: left; background: #000; padding: 15px 20px; margin: 0; flex: 1; }
+        .input-area input { text-align: left; background: #000; padding: 12px 15px; margin: 0; flex: 1; border-radius: 15px; font-size: 14px;}
         
+        .media-btn {
+            width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--glass-border);
+            background: var(--glass-bg); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
         .send-btn {
-            width: 55px; height: 55px; border-radius: 20px; border: none;
-            background: var(--primary); color: #000; font-size: 18px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 5px 15px var(--primary-glow);
+            width: 42px; height: 42px; border-radius: 12px; border: none;
+            background: var(--primary); color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center;
         }
-
-        /* --- АДМИН ПАНЕЛЬ --- */
-        #admin-panel {
-            position: fixed; inset: 0; background: #000; z-index: 1000;
-            display: none; flex-direction: column; padding: calc(20px + var(--safe-top)) 20px;
-        }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
-        .request-card {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            padding: 20px; border-radius: 25px; display: flex; align-items: center;
-            justify-content: space-between; margin-bottom: 12px;
-        }
-        .request-card img { width: 45px; height: 45px; border-radius: 12px; }
+        .recording-ui { color: var(--danger); font-weight: 700; animation: pulse 1s infinite; display: none; margin-right: 10px; }
 
-        .badge-admin { 
-            font-size: 9px; padding: 2px 6px; border: 1px solid gold; 
-            color: gold; border-radius: 5px; margin-left: 5px; 
-        }
-
-        /* Тайпинг */
-        #typing-note { 
-            height: 20px; font-size: 12px; color: var(--primary); 
-            padding: 0 20px; opacity: 0; transition: 0.3s;
-        }
-
-        /* Адаптив под 388px */
-        @media (max-width: 400px) {
-            .auth-card { width: 92%; }
-            .bubble { font-size: 14px; }
-        }
+        /* Прочее */
+        .del-ico { position: absolute; top: -8px; right: -8px; background: var(--danger); width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 10; }
+        body.is-admin .del-ico { display: flex; }
+        #typing-note { height: 18px; font-size: 11px; color: var(--primary); padding: 0 20px; opacity: 0; }
+        #admin-panel { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; padding: calc(20px + var(--safe-top)) 20px; }
+        .badge-admin { font-size: 9px; padding: 2px 6px; border: 1px solid gold; color: gold; border-radius: 5px; margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -200,82 +160,64 @@
 
     <div id="auth-screen" class="screen active">
         <div class="auth-card">
-            <div class="logo-box">
-                <h1>FAMILY VAULT</h1>
-            </div>
-
+            <div class="logo-box"><h1>FAMILY VAULT</h1></div>
             <div class="avatar-selection">
                 <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Denis" id="user-avatar">
-                <label class="file-label" for="avatar-input">
-                    <i class="fas fa-plus"></i>
-                </label>
+                <label class="file-label" for="avatar-input"><i class="fas fa-plus"></i></label>
                 <input type="file" id="avatar-input" hidden accept="image/*" onchange="uploadPhoto(event)">
             </div>
-
-            <div class="input-group">
-                <input type="text" id="user-name" placeholder="Ваше имя">
-            </div>
-            
-            <div id="pass-block" class="input-group" style="display: none;">
-                <input type="password" id="admin-password" placeholder="Пароль Главы Семьи">
-            </div>
-
+            <div class="input-group"><input type="text" id="user-name" placeholder="Ваше имя"></div>
+            <div id="pass-block" class="input-group" style="display: none;"><input type="password" id="admin-password" placeholder="Пароль Главы"></div>
             <button class="btn-main" onclick="initEntry()">Запросить доступ</button>
-            <p style="font-size: 12px; color: #555; margin-top: 20px;">v3.0 Secure Connection Established</p>
         </div>
     </div>
 
     <div id="pending-screen" class="screen">
         <div class="wait-icon"><i class="fas fa-shield-halved"></i></div>
-        <h2 style="font-family: 'Orbitron'; color: var(--primary);">ПРОВЕРКА ЛИЧНОСТИ</h2>
-        <p style="color: #888; line-height: 1.6;">Ваш профиль отправлен <b>Денису</b>.<br>Доступ к семейному архиву будет открыт после подтверждения.</p>
-        <div style="margin-top: 30px; color: var(--primary); font-size: 13px;">
-            <i class="fas fa-circle-notch fa-spin"></i> Ожидание одобрения...
-        </div>
-        <button onclick="clearAll()" style="margin-top: 50px; background: none; border: none; color: #444;">Отменить запрос</button>
+        <h2 style="font-family: 'Orbitron'; color: var(--primary);">ПРОВЕРКА</h2>
+        <p style="color: #888;">Ожидайте подтверждения от Дениса...</p>
+        <button onclick="clearAll()" style="margin-top: 50px; background: none; border: none; color: #444;">Отмена</button>
     </div>
 
     <div id="app-screen" class="screen">
         <header>
             <div class="user-status">
                 <img id="header-ava" src="">
-                <div>
-                    <b id="header-name">Семейный чат</b>
-                    <span><i class="fas fa-circle" style="font-size: 8px;"></i> Защищено</span>
-                </div>
+                <div><b id="header-name">Семейный чат</b><span><i class="fas fa-circle" style="font-size: 8px;"></i> Защищено</span></div>
             </div>
-            <div style="display: flex; gap: 15px;">
-                <button id="admin-gate" style="display: none; background: none; border: 1px solid var(--primary); color: var(--primary); border-radius: 10px; padding: 5px 10px; font-size: 10px;" onclick="openAdmin()">УПРАВЛЕНИЕ</button>
+            <div style="display: flex; gap: 10px;">
+                <button id="admin-gate" style="display: none; background: none; border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; padding: 5px; font-size: 10px;" onclick="openAdmin()">ADMIN</button>
                 <i class="fas fa-power-off" style="color: #444; font-size: 20px;" onclick="clearAll()"></i>
             </div>
         </header>
 
         <div id="typing-note">Кто-то печатает...</div>
-
-        <div id="chat-flow">
-            </div>
+        <div id="chat-flow"></div>
 
         <div class="input-area">
-            <input type="text" id="msg-input" placeholder="Введите сообщение..." oninput="reportTyping()">
+            <label class="media-btn" for="media-input"><i class="fas fa-paperclip"></i></label>
+            <input type="file" id="media-input" hidden accept="image/*,video/*" onchange="sendMedia(event)">
+            
+            <div id="rec-status" class="recording-ui">REC</div>
+            <input type="text" id="msg-input" placeholder="Сообщение..." oninput="reportTyping()">
+            
+            <button id="voice-btn" class="media-btn" onclick="toggleVoice()"><i class="fas fa-microphone"></i></button>
             <button class="send-btn" onclick="sendData()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <div id="admin-panel">
-        <div class="admin-header">
-            <h2 style="font-family: 'Orbitron'; color: gold; margin: 0;">CONTROL PANEL</h2>
-            <i class="fas fa-times" style="font-size: 24px;" onclick="closeAdmin()"></i>
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="color:gold; font-family:'Orbitron';">ADMIN</h2>
+            <i class="fas fa-times" onclick="closeAdmin()"></i>
         </div>
-        <div id="request-list">
-            <p style="text-align: center; color: #444; margin-top: 40px;">Новых заявок пока нет</p>
-        </div>
+        <div id="request-list"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // --- CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyACp_gVvnpgF_P_0YpKXR5E8QeSTcLEA88",
             authDomain: "familychat-4125b.firebaseapp.com",
@@ -284,33 +226,23 @@
             messagingSenderId: "558123147956",
             appId: "1:558123147956:web:313a729de8d6dff4fa2de1"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let session = {
-            name: localStorage.getItem('vault_user') || "",
-            avatar: localStorage.getItem('vault_ava') || "https://api.dicebear.com/7.x/pixel-art/svg?seed=Denis",
-            isAdmin: false
-        };
-
+        let session = { name: localStorage.getItem('vault_user') || "", avatar: localStorage.getItem('vault_ava') || "", isAdmin: false };
         const BOSS = "Денис";
         const KEY = "qwaszx12";
+        let mediaRecorder;
+        let audioChunks = [];
 
-        // --- INIT ---
-        window.onload = () => {
-            initCanvas();
-            if (session.name) {
-                checkRealtimeStatus();
-            }
-        };
+        window.onload = () => { initCanvas(); if(session.name) checkRealtimeStatus(); };
 
         document.getElementById('user-name').oninput = (e) => {
-            const val = e.target.value.trim();
-            document.getElementById('pass-block').style.display = (val.toLowerCase() === BOSS.toLowerCase()) ? 'block' : 'none';
+            document.getElementById('pass-block').style.display = (e.target.value.toLowerCase() === BOSS.toLowerCase()) ? 'block' : 'none';
         };
 
         function uploadPhoto(event) {
+            const file = event.target.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
@@ -319,35 +251,25 @@
                     const canvas = document.createElement('canvas');
                     canvas.width = 150; canvas.height = 150;
                     canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
-                    session.avatar = canvas.toDataURL('image/jpeg', 0.8);
+                    session.avatar = canvas.toDataURL('image/jpeg', 0.7);
                     document.getElementById('user-avatar').src = session.avatar;
                 }
             };
-            reader.readAsDataURL(event.target.files[0]);
+            reader.readAsDataURL(file);
         }
 
         async function initEntry() {
             const name = document.getElementById('user-name').value.trim();
             if(!name) return;
-
-            if(name.toLowerCase() === BOSS.toLowerCase()) {
-                if(document.getElementById('admin-password').value !== KEY) return alert("Отказ в доступе: Неверный ключ");
-            }
-
+            if(name.toLowerCase() === BOSS.toLowerCase() && document.getElementById('admin-password').value !== KEY) return alert("HACK DETECTED");
+            
             session.name = name;
-            localStorage.setItem('vault_user', session.name);
+            localStorage.setItem('vault_user', name);
             localStorage.setItem('vault_ava', session.avatar);
 
-            const ref = db.collection("users").doc(session.name);
+            const ref = db.collection("users").doc(name);
             const doc = await ref.get();
-            if(!doc.exists) {
-                await ref.set({
-                    name: session.name,
-                    avatar: session.avatar,
-                    approved: (session.name.toLowerCase() === BOSS.toLowerCase()),
-                    typing: false
-                });
-            }
+            if(!doc.exists) await ref.set({ name, avatar: session.avatar, approved: (name.toLowerCase() === BOSS.toLowerCase()), typing: false });
             checkRealtimeStatus();
         }
 
@@ -355,21 +277,15 @@
             db.collection("users").doc(session.name).onSnapshot(doc => {
                 if(!doc.exists) return clearAll();
                 const data = doc.data();
-                
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                
-                if(data.approved) {
-                    startMain();
-                } else {
-                    document.getElementById('pending-screen').classList.add('active');
-                }
+                if(data.approved) startMain();
+                else document.getElementById('pending-screen').classList.add('active');
             });
         }
 
         function startMain() {
-            document.getElementById('app-screen').classList.add('active')
-            document.getElementById('header-ava').src = session.avatar;
-
+            document.getElementById('app-screen').classList.add('active');
+            document.getElementById('header-ava').src = session.avatar || 'https://api.dicebear.com/7.x/pixel-art/svg?seed=Family';
             if(session.name.toLowerCase() === BOSS.toLowerCase()) {
                 session.isAdmin = true;
                 document.body.classList.add('is-admin');
@@ -380,15 +296,81 @@
             listenTyping();
         }
 
-        // --- MESSAGES ---
+        // --- МЕДИА ЛОГИКА ---
+        async function sendMedia(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                let content = e.target.result;
+                // Сжатие если это картинка
+                if(file.type.includes('image')) {
+                    content = await compressImg(content);
+                }
+                await db.collection("messages").add({
+                    user: session.name,
+                    media: content,
+                    type: file.type.split('/')[0], // 'image' или 'video'
+                    time: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function toggleVoice() {
+            const btn = document.getElementById('voice-btn');
+            const status = document.getElementById('rec-status');
+
+            if (!mediaRecorder || mediaRecorder.state === "inactive") {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        await db.collection("messages").add({
+                            user: session.name,
+                            media: e.target.result,
+                            type: 'audio',
+                            time: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    };
+                    reader.readAsDataURL(audioBlob);
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                mediaRecorder.start();
+                btn.style.color = "var(--danger)";
+                status.style.display = "block";
+            } else {
+                mediaRecorder.stop();
+                btn.style.color = "var(--primary)";
+                status.style.display = "none";
+            }
+        }
+
+        function compressImg(base64) {
+            return new Promise(res => {
+                const img = new Image();
+                img.src = base64;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    if(w > 800) { h = h * (800/w); w = 800; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    res(canvas.toDataURL('image/jpeg', 0.6));
+                }
+            });
+        }
+
         async function sendData() {
             const inp = document.getElementById('msg-input');
-            const val = inp.value.trim();
-            if(!val) return;
-
+            if(!inp.value.trim()) return;
             await db.collection("messages").add({
                 user: session.name,
-                text: val,
+                text: inp.value.trim(),
                 time: firebase.firestore.FieldValue.serverTimestamp()
             });
             inp.value = "";
@@ -402,98 +384,72 @@
                 snap.forEach(doc => {
                     const m = doc.data();
                     const isMe = m.user === session.name;
+                    let content = m.text || '';
+                    if(m.media) {
+                        if(m.type === 'image') content = `<img src="${m.media}" onclick="window.open('${m.media}')">`;
+                        else if(m.type === 'video') content = `<video src="${m.media}" controls></video>`;
+                        else if(m.type === 'audio') content = `<audio src="${m.media}" controls></audio>`;
+                    }
                     const html = `
                         <div class="msg-block ${isMe ? 'me' : 'others'}">
-                            <span class="msg-author">${m.user} ${m.user.toLowerCase() === BOSS.toLowerCase() ? '<span class="badge-admin">BOSS</span>' : ''}</span>
+                            <span style="font-size:9px; color:var(--text-dim); margin:0 5px 2px;">${m.user}</span>
                             <div class="bubble">
-                                ${m.text}
+                                ${content}
                                 ${session.isAdmin ? `<div class="del-ico" onclick="deleteItem('${doc.id}')">×</div>` : ''}
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                     box.insertAdjacentHTML('beforeend', html);
                 });
                 box.scrollTop = box.scrollHeight;
             });
         }
 
-        // --- ADMIN ---
         function openAdmin() { document.getElementById('admin-panel').style.display = 'flex'; }
         function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 
         function loadRequests() {
             db.collection("users").where("approved", "==", false).onSnapshot(snap => {
                 const list = document.getElementById('request-list');
-                list.innerHTML = "";
-                if(snap.empty) list.innerHTML = "<p style='text-align:center; color:#333; margin-top:30px;'>Все допущены</p>";
-                
+                list.innerHTML = snap.empty ? "<p>Нет заявок</p>" : "";
                 snap.forEach(doc => {
                     const u = doc.data();
-                    list.innerHTML += `
-                        <div class="request-card">
-                            <div style="display:flex; align-items:center; gap:12px">
-                                <img src="${u.avatar}">
-                                <b>${u.name}</b>
-                            </div>
-                            <div style="display:flex; gap:10px">
-                                <button onclick="grant('${u.name}', true)" style="border:none; background:var(--success); padding:8px 12px; border-radius:10px;"><i class="fas fa-check"></i></button>
-                                <button onclick="grant('${u.name}', false)" style="border:none; background:var(--danger); padding:8px 12px; border-radius:10px;"><i class="fas fa-trash"></i></button>
-                            </div>
+                    list.innerHTML += `<div style="display:flex; justify-content:space-between; background:var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:10px;">
+                        <span>${u.name}</span>
+                        <div>
+                            <button onclick="grant('${u.name}',true)" style="background:var(--success); border:none; border-radius:5px; padding:5px 10px;">OK</button>
+                            <button onclick="grant('${u.name}',false)" style="background:var(--danger); border:none; border-radius:5px; padding:5px 10px;">X</button>
                         </div>
-                    `;
+                    </div>`;
                 });
             });
         }
 
-        function grant(name, ok) {
-            if(ok) db.collection("users").doc(name).update({ approved: true });
-            else db.collection("users").doc(name).delete();
-        }
-
-        function deleteItem(id) {
-            if(confirm("Удалить это сообщение?")) db.collection("messages").doc(id).delete();
-        }
-
-        function reportTyping() {
+        function grant(n, ok) { ok ? db.collection("users").doc(n).update({ approved: true }) : db.collection("users").doc(n).delete(); }
+        function deleteItem(id) { if(confirm("Удалить?")) db.collection("messages").doc(id).delete(); }
+        function reportTyping() { 
             db.collection("users").doc(session.name).update({ typing: true });
-            clearTimeout(window.t_tm);
-            window.t_tm = setTimeout(() => {
-                db.collection("users").doc(session.name).update({ typing: false });
-            }, 3000);
+            clearTimeout(window.t_tm); 
+            window.t_tm = setTimeout(() => db.collection("users").doc(session.name).update({ typing: false }), 3000);
         }
-
         function listenTyping() {
             db.collection("users").where("typing", "==", true).onSnapshot(snap => {
                 const note = document.getElementById('typing-note');
-                let users = [];
-                snap.forEach(d => { if(d.id !== session.name) users.push(d.id); });
-                if(users.length > 0) {
-                    note.innerText = users.join(', ') + " печатает...";
-                    note.style.opacity = 1;
-                } else {
-                    note.style.opacity = 0;
-                }
+                let u = []; snap.forEach(d => { if(d.id !== session.name) u.push(d.id) });
+                note.style.opacity = u.length > 0 ? 1 : 0;
+                note.innerText = u.join(', ') + " печатает...";
             });
         }
 
-        function clearAll() {
-            localStorage.clear();
-            location.reload();
-        }
+        function clearAll() { localStorage.clear(); location.reload(); }
 
         function initCanvas() {
-            const c = document.getElementById('bg-canvas');
-            const ctx = c.getContext('2d');
+            const c = document.getElementById('bg-canvas'); const ctx = c.getContext('2d');
             c.width = window.innerWidth; c.height = window.innerHeight;
-            let pts = [];
-            for(let i=0; i<40; i++) pts.push({x:Math.random()*c.width, y:Math.random()*c.height, vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5});
+            let pts = []; for(let i=0; i<30; i++) pts.push({x:Math.random()*c.width, y:Math.random()*c.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3});
             function anim() {
-                ctx.clearRect(0,0,c.width,c.height);
-                ctx.fillStyle = "rgba(0, 242, 255, 0.3)";
+                ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = "rgba(0, 242, 255, 0.2)";
                 pts.forEach(p => {
-                    p.x += p.vx; p.y += p.vy;
-                    if(p.x<0 || p.x>c.width) p.vx*=-1;
-                    if(p.y<0 || p.y>c.height) p.vy*=-1;
+                    p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>c.width) p.vx*=-1; if(p.y<0||p.y>c.height) p.vy*=-1;
                     ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
                 });
                 requestAnimationFrame(anim);
