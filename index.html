@@ -3,56 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Family Vault | Security Elite</title>
+    <title>Family Vault | Security Elite v2.0</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- ДИЗАЙН-СИСТЕМА --- */
+        /* =========================================
+           1. ДИЗАЙН-СИСТЕМА И ТЕМЫ
+           ========================================= */
         :root {
+            /* Базовые (по умолчанию Киберпанк) */
             --primary: #00f2ff;
             --primary-glow: rgba(0, 242, 255, 0.4);
             --bg-dark: #05080a;
+            --bg-panel: rgba(10, 15, 20, 0.95);
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --text-main: #e0e0e0;
             --text-dim: #888;
+            --bubble-me: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --bubble-others: rgba(255, 255, 255, 0.05);
+            
             --danger: #ff3e3e;
             --success: #00ff88;
+            --warning: #ffcc00;
+            
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
+            --anim-speed: 0.3s;
         }
 
-        /* --- БАЗОВЫЕ СТИЛИ --- */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        /* Тема: Светлая */
+        [data-theme="light"] {
+            --primary: #0072ff;
+            --primary-glow: rgba(0, 114, 255, 0.2);
+            --bg-dark: #f0f2f5;
+            --bg-panel: rgba(255, 255, 255, 0.95);
+            --glass-bg: rgba(0, 0, 0, 0.03);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --text-main: #1a1d21;
+            --text-dim: #65676b;
+            --bubble-me: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+            --bubble-others: #ffffff;
+        }
+
+        /* Тема: Ночной чат (Deep Dark) */
+        [data-theme="night"] {
+            --primary: #4a90e2;
+            --primary-glow: rgba(74, 144, 226, 0.3);
+            --bg-dark: #000000;
+            --bg-panel: #111111;
+            --glass-bg: #1a1a1a;
+            --glass-border: #333;
+            --text-main: #d1d1d1;
+            --text-dim: #555;
+            --bubble-me: #2b5278;
+            --bubble-others: #1a1a1a;
+        }
+
+        /* =========================================
+           2. БАЗОВЫЕ СТИЛИ (RESET & LAYOUT)
+           ========================================= */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
         
+        /* Разрешаем выделение текста только в сообщениях */
+        .bubble { user-select: text; }
+
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             font-family: 'Montserrat', sans-serif;
             background: var(--bg-dark); color: var(--text-main);
             overflow: hidden; position: fixed; 
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.4; }
+        #bg-canvas { 
+            position: fixed; top: 0; left: 0; z-index: -1; 
+            width: 100%; height: 100%; opacity: 0.4; 
+            pointer-events: none;
+        }
 
+        /* Классы утилит */
+        .hidden { display: none !important; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .full-screen { position: absolute; inset: 0; }
+        
+        /* Скроллбар */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 2px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+
+        /* =========================================
+           3. КОМПОНЕНТЫ ЭКРАНОВ
+           ========================================= */
         .screen {
             position: absolute; inset: 0; display: none;
-            flex-direction: column; opacity: 0; transition: opacity 0.4s ease;
+            flex-direction: column; opacity: 0; 
+            transition: opacity 0.4s ease;
+            background: var(--bg-dark);
         }
-        .screen.active { display: flex; opacity: 1; }
+        .screen.active { display: flex; opacity: 1; z-index: 10; }
 
-        /* --- 1. ЭКРАН ВХОДА (AUTH) --- */
+        /* --- AUTH SCREEN --- */
         #auth-screen { 
             justify-content: center; align-items: center; padding: 20px;
-            background: radial-gradient(circle at center, #0a131a 0%, #05080a 100%);
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-dark) 100%);
         }
 
         .auth-card {
             width: 100%; max-width: 380px; padding: 40px 25px;
-            background: var(--glass-bg); backdrop-filter: blur(30px);
+            background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--glass-border); border-radius: 40px;
-            text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            transform: translateY(0); transition: transform 0.3s;
         }
 
         .logo-box h1 { 
@@ -66,6 +130,7 @@
             width: 100%; height: 100%; border-radius: 45px;
             object-fit: cover; border: 2px solid var(--glass-border);
             padding: 5px; transition: 0.3s;
+            background: rgba(0,0,0,0.2);
         }
 
         .file-label {
@@ -73,85 +138,270 @@
             background: var(--primary); color: #000; width: 36px; height: 36px;
             border-radius: 14px; display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
         }
+        .file-label:active { transform: scale(0.9); }
 
-        .input-group { width: 100%; margin-bottom: 15px; }
+        .input-group { width: 100%; margin-bottom: 15px; position: relative; }
         input {
             width: 100%; padding: 18px; border-radius: 20px; border: 1px solid var(--glass-border);
-            background: rgba(0,0,0,0.4); color: #fff; font-size: 16px; 
+            background: rgba(0,0,0,0.4); color: var(--text-main); font-size: 16px; 
             font-family: inherit; transition: 0.3s; text-align: center;
         }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
 
         .btn-main {
             width: 100%; padding: 18px; border-radius: 20px; border: none;
             background: var(--primary); color: #000; font-weight: 800;
             font-size: 14px; letter-spacing: 2px; cursor: pointer;
-            text-transform: uppercase; transition: 0.3s;
+            text-transform: uppercase; transition: 0.3s; margin-top: 10px;
         }
+        .btn-main:active { transform: scale(0.98); opacity: 0.8; }
 
-        /* --- 2. ЭКРАН ОЖИДАНИЯ --- */
+        /* --- PENDING SCREEN --- */
         #pending-screen { justify-content: center; align-items: center; text-align: center; padding: 40px; }
         .wait-icon { font-size: 50px; color: var(--primary); margin-bottom: 25px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.7; } }
 
-        /* --- 3. ГЛАВНЫЙ ЧАТ --- */
+        /* =========================================
+           4. ГЛАВНЫЙ ИНТЕРФЕЙС ЧАТА
+           ========================================= */
+        
+        /* Шапка */
         header {
-            padding: calc(15px + var(--safe-top)) 20px 15px;
-            background: rgba(5, 8, 10, 0.8); backdrop-filter: blur(20px);
+            padding: calc(10px + var(--safe-top)) 15px 10px;
+            background: var(--bg-panel); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex; flex-direction: column; gap: 10px;
+            z-index: 100;
+        }
+        .header-top { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+
+        .user-status { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .user-status img { width: 42px; height: 42px; border-radius: 15px; object-fit: cover; }
+        .user-info b { display: block; font-size: 15px; color: var(--primary); }
+        .user-info .status-text { font-size: 11px; color: var(--text-dim); display: block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .header-actions { display: flex; gap: 15px; align-items: center; }
+        .icon-btn { font-size: 20px; color: var(--text-dim); cursor: pointer; transition: color 0.2s; }
+        .icon-btn:hover { color: var(--primary); }
+
+        /* Закрепленное сообщение */
+        #pinned-container {
+            display: none; /* Flex when active */
+            background: rgba(255, 215, 0, 0.1); border-left: 3px solid gold;
+            padding: 8px 12px; border-radius: 8px;
+            font-size: 12px; color: var(--text-main);
+            align-items: center; justify-content: space-between;
+            cursor: pointer;
+        }
+        #pinned-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%; }
+
+        /* Поиск */
+        #search-bar {
+            display: none; /* Flex when active */
+            background: var(--glass-bg); border-radius: 12px; padding: 8px;
+            margin-top: 5px; border: 1px solid var(--glass-border);
+        }
+        #search-input { 
+            background: transparent; border: none; padding: 5px; 
+            text-align: left; font-size: 14px; color: var(--text-main); height: auto;
         }
 
-        .user-status { display: flex; align-items: center; gap: 12px; }
-        .user-status img { width: 42px; height: 42px; border-radius: 15px; object-fit: cover; }
-        .user-status b { display: block; font-size: 15px; color: var(--primary); }
-        .user-status span { font-size: 11px; color: var(--success); }
-
+        /* Область чата */
         #chat-flow {
             flex: 1; overflow-y: auto; padding: 20px 15px;
-            display: flex; flex-direction: column; gap: 15px;
+            display: flex; flex-direction: column; gap: 8px;
+            scroll-behavior: smooth;
         }
 
-        /* Сообщения */
-        .msg-block { display: flex; flex-direction: column; max-width: 85%; position: relative; }
-        .msg-block.me { align-self: flex-end; }
-        .msg-block.others { align-self: flex-start; }
+        /* =========================================
+           5. СООБЩЕНИЯ И ФУНКЦИОНАЛ
+           ========================================= */
+        .msg-wrapper {
+            display: flex; flex-direction: column; 
+            max-width: 85%; position: relative;
+            transition: transform 0.2s;
+        }
+        /* Свайп эффект */
+        .msg-wrapper.swiping { transition: none; } 
+
+        .msg-wrapper.me { align-self: flex-end; align-items: flex-end; }
+        .msg-wrapper.others { align-self: flex-start; align-items: flex-start; }
+
+        .sender-name { font-size: 10px; color: var(--text-dim); margin-bottom: 2px; margin-left: 10px; }
+        .me .sender-name { margin-right: 10px; display: none; }
 
         .bubble {
-            padding: 12px; border-radius: 20px; font-size: 15px; line-height: 1.5;
-            position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.5;
+            position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-width: 60px; word-wrap: break-word;
         }
-        .me .bubble { background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); color: #fff; border-bottom-right-radius: 4px; }
-        .others .bubble { background: var(--glass-bg); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; }
+        .me .bubble { background: var(--bubble-me); color: #fff; border-bottom-right-radius: 4px; }
+        .others .bubble { background: var(--bubble-others); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; color: var(--text-main); }
 
-        /* Медиа в чате */
-        .bubble img, .bubble video { max-width: 100%; border-radius: 12px; display: block; }
-        .bubble audio { width: 200px; height: 40px; margin-top: 5px; }
+        /* Контекст ответа в сообщении */
+        .reply-context {
+            background: rgba(0,0,0,0.2); border-left: 3px solid var(--primary);
+            padding: 5px 8px; border-radius: 6px; margin-bottom: 6px;
+            font-size: 11px; cursor: pointer; opacity: 0.8;
+        }
+        .reply-name { font-weight: 700; color: var(--primary); margin-bottom: 2px; }
 
-        /* Ввод */
+        /* Медиа */
+        .bubble img, .bubble video { max-width: 100%; border-radius: 12px; display: block; margin-top: 5px; }
+        .bubble audio { width: 200px; height: 32px; margin-top: 5px; filter: invert(0); }
+        [data-theme="light"] .bubble audio { filter: invert(1); }
+
+        /* Мета (время, изменено) */
+        .msg-meta {
+            display: flex; justify-content: flex-end; align-items: center; gap: 4px;
+            font-size: 9px; opacity: 0.7; margin-top: 4px;
+        }
+        .edited-mark { font-style: italic; }
+
+        /* Реакции */
+        .reactions-bar {
+            display: flex; gap: 2px; margin-top: -10px; z-index: 2;
+            background: var(--bg-panel); border: 1px solid var(--glass-border);
+            padding: 2px 4px; border-radius: 10px; font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transform: scale(0); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .reactions-bar.visible { transform: scale(1); }
+        .me .reactions-bar { margin-right: 10px; }
+        .others .reactions-bar { margin-left: 10px; }
+
+        /* Опросы */
+        .poll-card { width: 220px; }
+        .poll-title { font-weight: 700; margin-bottom: 8px; }
+        .poll-opt {
+            background: rgba(255,255,255,0.1); border-radius: 6px;
+            margin-bottom: 5px; padding: 8px; position: relative;
+            cursor: pointer; overflow: hidden; border: 1px solid transparent;
+        }
+        .poll-opt.voted { border-color: var(--primary); }
+        .poll-bar {
+            position: absolute; left: 0; top: 0; bottom: 0;
+            background: var(--primary); opacity: 0.2; width: 0%;
+            transition: width 0.5s ease; z-index: 0;
+        }
+        .poll-text { position: relative; z-index: 1; display: flex; justify-content: space-between; font-size: 12px; }
+
+        /* =========================================
+           6. ОБЛАСТЬ ВВОДА
+           ========================================= */
+        .input-wrapper {
+            background: var(--bg-panel); 
+            padding-bottom: var(--safe-bottom);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        /* Панель ответа (над вводом) */
+        #reply-preview {
+            display: none; align-items: center; justify-content: space-between;
+            padding: 8px 15px; background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--glass-border); font-size: 12px;
+        }
+        #reply-preview-content { border-left: 3px solid var(--primary); padding-left: 8px; color: var(--text-dim); }
+
         .input-area {
-            padding: 10px 15px calc(15px + var(--safe-bottom));
-            background: rgba(10, 15, 20, 0.95); display: flex; gap: 8px; align-items: center;
+            padding: 10px 15px;
+            display: flex; gap: 8px; align-items: flex-end;
         }
-        .input-area input { text-align: left; background: #000; padding: 12px 15px; margin: 0; flex: 1; border-radius: 15px; font-size: 14px;}
         
         .media-btn {
-            width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--glass-border);
-            background: var(--glass-bg); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 18px;
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--glass-border);
+            background: var(--glass-bg); color: var(--text-dim); 
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+            flex-shrink: 0; cursor: pointer; transition: 0.2s;
         }
-        .send-btn {
-            width: 42px; height: 42px; border-radius: 12px; border: none;
-            background: var(--primary); color: #000; font-size: 18px; display: flex; align-items: center; justify-content: center;
+        .media-btn:active { background: var(--primary); color: #000; }
+
+        #msg-input { 
+            text-align: left; background: var(--glass-bg); 
+            padding: 10px 15px; margin: 0; flex: 1; border-radius: 20px; 
+            font-size: 15px; max-height: 100px; resize: none; overflow-y: auto;
+            border: 1px solid var(--glass-border);
         }
         
-        .recording-ui { color: var(--danger); font-weight: 700; animation: pulse 1s infinite; display: none; margin-right: 10px; }
+        .send-btn {
+            width: 40px; height: 40px; border-radius: 50%; border: none;
+            background: var(--primary); color: #000; font-size: 16px; 
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .send-btn:active { transform: scale(0.8); }
 
-        /* Прочее */
-        .del-ico { position: absolute; top: -8px; right: -8px; background: var(--danger); width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 10; }
-        body.is-admin .del-ico { display: flex; }
-        #typing-note { height: 18px; font-size: 11px; color: var(--primary); padding: 0 20px; opacity: 0; }
-        #admin-panel { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; padding: calc(20px + var(--safe-top)) 20px; }
-        .badge-admin { font-size: 9px; padding: 2px 6px; border: 1px solid gold; color: gold; border-radius: 5px; margin-left: 5px; }
+        .recording-ui { color: var(--danger); font-weight: 700; animation: pulse 1s infinite; display: none; margin-right: 10px; align-self: center; }
+
+        #typing-note { height: 20px; font-size: 10px; color: var(--primary); padding: 0 20px; opacity: 0; transition: opacity 0.3s; position: absolute; bottom: 70px; }
+
+        /* =========================================
+           7. МОДАЛЬНЫЕ ОКНА И МЕНЮ
+           ========================================= */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal-box {
+            width: 90%; max-width: 320px; background: var(--bg-panel);
+            border: 1px solid var(--glass-border); border-radius: 25px;
+            padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-family: 'Orbitron'; color: var(--primary); font-size: 18px; margin: 0; }
+        .modal-close { font-size: 20px; color: var(--text-dim); cursor: pointer; }
+
+        /* Контекстное меню (Реакции) */
+        #context-menu {
+            position: fixed; z-index: 2000; display: none;
+            flex-direction: column; background: var(--bg-panel);
+            border-radius: 15px; border: 1px solid var(--glass-border);
+            padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .reaction-row { display: flex; gap: 10px; padding: 5px; justify-content: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-bottom: 5px; }
+        .reaction-btn { font-size: 24px; cursor: pointer; transition: transform 0.2s; }
+        .reaction-btn:hover { transform: scale(1.3); }
+
+        .context-action { padding: 10px 15px; color: var(--text-main); font-size: 14px; cursor: pointer; display: flex; gap: 10px; align-items: center; }
+        .context-action:active { background: var(--glass-bg); border-radius: 8px; }
+        .context-action.danger { color: var(--danger); }
+
+        /* Меню вложений */
+        #attach-menu {
+            position: absolute; bottom: 80px; left: 15px;
+            background: var(--bg-panel); border-radius: 15px; border: 1px solid var(--glass-border);
+            padding: 10px; display: none; flex-direction: column; gap: 5px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 90;
+        }
+        .attach-opt { padding: 10px; display: flex; align-items: center; gap: 10px; color: var(--text-main); font-size: 14px; cursor: pointer; }
+        .attach-opt:hover { color: var(--primary); }
+
+        /* Логи админа */
+        .log-row { font-family: monospace; font-size: 10px; border-bottom: 1px solid #333; padding: 5px 0; color: #aaa; }
+        .log-row span { color: var(--primary); }
+
+        /* Настройки темы */
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .theme-opt { 
+            height: 50px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;
+        }
+        .theme-opt.active { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+
+        /* Админ список */
+        .req-item { display:flex; justify-content:space-between; background:var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:10px; align-items: center; }
+        
+        /* Badge */
+        .badge-admin { font-size: 9px; padding: 2px 6px; border: 1px solid gold; color: gold; border-radius: 5px; margin-left: 5px; background: rgba(255, 215, 0, 0.1); }
     </style>
 </head>
 <body>
@@ -162,66 +412,164 @@
         <div class="auth-card">
             <div class="logo-box"><h1>FAMILY VAULT</h1></div>
             <div class="avatar-selection">
-                <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Denis" id="user-avatar">
-                <label class="file-label" for="avatar-input"><i class="fas fa-plus"></i></label>
-                <input type="file" id="avatar-input" hidden accept="image/*" onchange="uploadPhoto(event)">
+                <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Guest" id="user-avatar">
+                <label class="file-label" for="avatar-input"><i class="fas fa-camera"></i></label>
+                <input type="file" id="avatar-input" hidden accept="image/*" onchange="App.uploadPhoto(event)">
             </div>
-            <div class="input-group"><input type="text" id="user-name" placeholder="Ваше имя"></div>
-            <div id="pass-block" class="input-group" style="display: none;"><input type="password" id="admin-password" placeholder="Пароль Главы"></div>
-            <button class="btn-main" onclick="initEntry()">Запросить доступ</button>
+            <div class="input-group"><input type="text" id="user-name" placeholder="Введите имя"></div>
+            <div id="pass-block" class="input-group hidden"><input type="password" id="admin-password" placeholder="Пароль Главы"></div>
+            <button class="btn-main" onclick="App.initEntry()">Запросить доступ</button>
         </div>
     </div>
 
     <div id="pending-screen" class="screen">
         <div class="wait-icon"><i class="fas fa-shield-halved"></i></div>
         <h2 style="font-family: 'Orbitron'; color: var(--primary);">ПРОВЕРКА</h2>
-        <p style="color: #888;">Ожидайте подтверждения от Дениса...</p>
-        <button onclick="clearAll()" style="margin-top: 50px; background: none; border: none; color: #444;">Отмена</button>
+        <p style="color: var(--text-dim);">Ожидайте подтверждения от Дениса...</p>
+        <button onclick="App.clearAll()" style="margin-top: 50px; background: none; border: none; color: var(--text-dim); text-decoration:underline;">Отмена / Выход</button>
     </div>
 
     <div id="app-screen" class="screen">
         <header>
-            <div class="user-status">
-                <img id="header-ava" src="">
-                <div><b id="header-name">Семейный чат</b><span><i class="fas fa-circle" style="font-size: 8px;"></i> Защищено</span></div>
+            <div class="header-top">
+                <div class="user-status" onclick="UI.openSettings()">
+                    <img id="header-ava" src="">
+                    <div class="user-info">
+                        <b id="header-name">Загрузка...</b>
+                        <span id="header-status" class="status-text">В сети</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <i class="fas fa-search icon-btn" onclick="UI.toggleSearch()"></i>
+                    <i id="admin-gate" class="fas fa-user-shield icon-btn hidden" onclick="UI.openAdmin()" style="color: gold;"></i>
+                </div>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button id="admin-gate" style="display: none; background: none; border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; padding: 5px; font-size: 10px;" onclick="openAdmin()">ADMIN</button>
-                <i class="fas fa-power-off" style="color: #444; font-size: 20px;" onclick="clearAll()"></i>
+            
+            <div id="search-bar">
+                <input type="text" id="search-input" placeholder="Поиск сообщений..." oninput="Chat.filterMessages(this.value)">
+            </div>
+
+            <div id="pinned-container" onclick="Chat.scrollToPinned()">
+                <div style="display:flex; gap:10px; align-items:center; overflow:hidden;">
+                    <i class="fas fa-thumbtack" style="color:gold;"></i>
+                    <span id="pinned-text">...</span>
+                </div>
+                <i class="fas fa-times" onclick="event.stopPropagation(); Chat.unpinMessage(true)" id="unpin-btn" style="opacity:0.5;"></i>
             </div>
         </header>
 
-        <div id="typing-note">Кто-то печатает...</div>
         <div id="chat-flow"></div>
+        <div id="typing-note"></div>
 
-        <div class="input-area">
-            <label class="media-btn" for="media-input"><i class="fas fa-paperclip"></i></label>
-            <input type="file" id="media-input" hidden accept="image/*,video/*" onchange="sendMedia(event)">
+        <div class="input-wrapper">
+            <div id="reply-preview">
+                <span id="reply-preview-content"></span>
+                <i class="fas fa-times" onclick="Chat.cancelReply()"></i>
+            </div>
             
-            <div id="rec-status" class="recording-ui">REC</div>
-            <input type="text" id="msg-input" placeholder="Сообщение..." oninput="reportTyping()" onkeypress="if(event.key==='Enter') sendData()">
-<button class="send-btn" onclick="sendData()">
-    <i class="fas fa-paper-plane"></i>
-</button>
-            
-	<button id="voice-btn" class="media-btn" onclick="toggleVoice()">
-    	<i class="fas fa-microphone"></i>
-	</button>
+            <div class="input-area">
+                <div style="position: relative;">
+                    <button class="media-btn" onclick="UI.toggleAttachMenu()"><i class="fas fa-plus"></i></button>
+                    <div id="attach-menu">
+                        <label class="attach-opt" for="media-input"><i class="fas fa-image" style="color:#4facfe;"></i> Фото/Видео</label>
+                        <div class="attach-opt" onclick="UI.openPollModal()"><i class="fas fa-poll" style="color:#00f2ff;"></i> Опрос</div>
+                    </div>
+                    <input type="file" id="media-input" hidden accept="image/*,video/*" onchange="Chat.sendMedia(event)">
+                </div>
+
+                <div id="rec-status" class="recording-ui">● REC <span id="rec-time">0:00</span></div>
+                
+                <textarea id="msg-input" placeholder="Сообщение..." rows="1" oninput="App.autoResize(this); Chat.reportTyping()"></textarea>
+                
+                <button class="media-btn" id="voice-btn" onclick="Chat.toggleVoice()"><i class="fas fa-microphone"></i></button>
+                <button class="send-btn" onclick="Chat.sendText()"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
     </div>
 
-    <div id="admin-panel">
-        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="color:gold; font-family:'Orbitron';">ADMIN</h2>
-            <i class="fas fa-times" onclick="closeAdmin()"></i>
+    <div id="context-menu">
+        <div class="reaction-row">
+            <span class="reaction-btn" onclick="Chat.react('❤️')">❤️</span>
+            <span class="reaction-btn" onclick="Chat.react('😂')">😂</span>
+            <span class="reaction-btn" onclick="Chat.react('👍')">👍</span>
+            <span class="reaction-btn" onclick="Chat.react('🔥')">🔥</span>
         </div>
-        <div id="request-list"></div>
+        <div class="context-action" onclick="Chat.initReplyFromContext()"><i class="fas fa-reply"></i> Ответить</div>
+        <div class="context-action" id="ctx-copy" onclick="Chat.copyText()"><i class="fas fa-copy"></i> Копировать</div>
+        <div class="context-action" id="ctx-pin" onclick="Chat.pinMessageFromContext()"><i class="fas fa-thumbtack"></i> Закрепить</div>
+        <div class="context-action" id="ctx-edit" onclick="Chat.editMessageStart()"><i class="fas fa-pen"></i> Редактировать</div>
+        <div class="context-action danger" id="ctx-del" onclick="Chat.deleteMessage()"><i class="fas fa-trash"></i> Удалить</div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">НАСТРОЙКИ</h3>
+                <i class="fas fa-times modal-close" onclick="UI.closeModals()"></i>
+            </div>
+            
+            <p style="font-size:12px; color:var(--text-dim); margin-bottom:5px;">ВАШ СТАТУС</p>
+            <div class="input-group">
+                <input type="text" id="status-input" placeholder="Например: На работе...">
+            </div>
+            <button class="btn-main" onclick="UI.saveStatus()" style="margin-bottom:20px;">Сохранить статус</button>
+
+            <p style="font-size:12px; color:var(--text-dim);">ТЕМА ОФОРМЛЕНИЯ</p>
+            <div class="theme-grid">
+                <div class="theme-opt" style="background:#05080a; color:#00f2ff; border-color:#00f2ff;" onclick="UI.setTheme('cyber')">CYBER</div>
+                <div class="theme-opt" style="background:#f0f2f5; color:#333;" onclick="UI.setTheme('light')">LIGHT</div>
+                <div class="theme-opt" style="background:#000; color:#4a90e2;" onclick="UI.setTheme('night')">NIGHT</div>
+            </div>
+
+            <div style="margin-top:20px; text-align:center;">
+                <button onclick="App.clearAll()" style="background:var(--danger); border:none; color:#fff; padding:10px 20px; border-radius:10px;">ВЫЙТИ ИЗ АККАУНТА</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="poll-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">СОЗДАТЬ ОПРОС</h3>
+                <i class="fas fa-times modal-close" onclick="UI.closeModals()"></i>
+            </div>
+            <input type="text" id="poll-question" placeholder="Задай вопрос..." style="margin-bottom:10px;">
+            <div id="poll-options">
+                <input type="text" class="poll-opt-input" placeholder="Вариант 1" style="margin-bottom:5px;">
+                <input type="text" class="poll-opt-input" placeholder="Вариант 2" style="margin-bottom:5px;">
+            </div>
+            <button onclick="UI.addPollOption()" style="background:transparent; border:1px dashed var(--text-dim); color:var(--text-dim); width:100%; padding:8px; border-radius:10px; margin-bottom:15px;">+ Добавить вариант</button>
+            <button class="btn-main" onclick="Chat.sendPoll()">Опубликовать</button>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="modal-overlay">
+        <div class="modal-box" style="max-width:400px; height:80vh; display:flex; flex-direction:column;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:gold;">ADMIN PANEL</h3>
+                <i class="fas fa-times modal-close" onclick="UI.closeModals()"></i>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button onclick="UI.switchAdminTab('req')" class="btn-main" style="padding:10px; font-size:10px;">Заявки</button>
+                <button onclick="UI.switchAdminTab('logs')" class="btn-main" style="padding:10px; font-size:10px; background:#333; color:#fff;">Логи</button>
+            </div>
+            <div id="admin-content-req" style="flex:1; overflow-y:auto;">
+                <div id="request-list"></div>
+            </div>
+            <div id="admin-content-logs" style="flex:1; overflow-y:auto; display:none; background:#000; padding:10px; border-radius:10px;">
+                <div id="log-list"></div>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
 
     <script>
+        // =========================================
+        // 1. КОНФИГУРАЦИЯ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        // =========================================
         const firebaseConfig = {
             apiKey: "AIzaSyACp_gVvnpgF_P_0YpKXR5E8QeSTcLEA88",
             authDomain: "familychat-4125b.firebaseapp.com",
@@ -230,249 +578,871 @@
             messagingSenderId: "558123147956",
             appId: "1:558123147956:web:313a729de8d6dff4fa2de1"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        let session = { name: localStorage.getItem('vault_user') || "", avatar: localStorage.getItem('vault_ava') || "", isAdmin: false };
+        
+        // Константы
         const BOSS = "Денис";
         const KEY = "qwaszx12";
-        let mediaRecorder;
-        let audioChunks = [];
-
-        window.onload = () => { initCanvas(); if(session.name) checkRealtimeStatus(); };
-
-        document.getElementById('user-name').oninput = (e) => {
-            document.getElementById('pass-block').style.display = (e.target.value.toLowerCase() === BOSS.toLowerCase()) ? 'block' : 'none';
+        
+        // Состояние сессии
+        let session = {
+            name: localStorage.getItem('vault_user') || "",
+            avatar: localStorage.getItem('vault_ava') || "",
+            theme: localStorage.getItem('vault_theme') || "cyber",
+            isAdmin: false,
+            replyTo: null,
+            editingId: null
         };
 
-        function uploadPhoto(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 150; canvas.height = 150;
-                    canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
-                    session.avatar = canvas.toDataURL('image/jpeg', 0.7);
-                    document.getElementById('user-avatar').src = session.avatar;
+        // Аудио
+        let mediaRecorder;
+        let audioChunks = [];
+        let recInterval;
+
+        // =========================================
+        // 2. ЯДРО ПРИЛОЖЕНИЯ (APP CORE)
+        // =========================================
+        const App = {
+            init: () => {
+                App.initCanvas();
+                UI.setTheme(session.theme);
+                
+                // Проверка имени пользователя при вводе (для показа поля пароля)
+                document.getElementById('user-name').oninput = (e) => {
+                    const isBoss = e.target.value.trim().toLowerCase() === BOSS.toLowerCase();
+                    document.getElementById('pass-block').classList.toggle('hidden', !isBoss);
+                };
+
+                if (session.name) App.checkRealtimeStatus();
+                
+                // Глобальный клик для закрытия меню
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.media-btn') && !e.target.closest('#attach-menu')) {
+                        document.getElementById('attach-menu').style.display = 'none';
+                    }
+                    if (!e.target.closest('.bubble') && !e.target.closest('#context-menu')) {
+                        document.getElementById('context-menu').style.display = 'none';
+                    }
+                });
+
+                // Инициализация уведомлений
+                if ("Notification" in window) {
+                    Notification.requestPermission();
                 }
-            };
-            reader.readAsDataURL(file);
-        }
+            },
 
-        async function initEntry() {
-            const name = document.getElementById('user-name').value.trim();
-            if(!name) return;
-            if(name.toLowerCase() === BOSS.toLowerCase() && document.getElementById('admin-password').value !== KEY) return alert("HACK DETECTED");
-            
-            session.name = name;
-            localStorage.setItem('vault_user', name);
-            localStorage.setItem('vault_ava', session.avatar);
+            // Загрузка фото профиля
+            uploadPhoto: (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 150; canvas.height = 150;
+                        const ctx = canvas.getContext('2d');
+                        // Простой кроп по центру
+                        const min = Math.min(img.width, img.height);
+                        ctx.drawImage(img, (img.width-min)/2, (img.height-min)/2, min, min, 0, 0, 150, 150);
+                        session.avatar = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('user-avatar').src = session.avatar;
+                    }
+                };
+                reader.readAsDataURL(file);
+            },
 
-            const ref = db.collection("users").doc(name);
-            const doc = await ref.get();
-            if(!doc.exists) await ref.set({ name, avatar: session.avatar, approved: (name.toLowerCase() === BOSS.toLowerCase()), typing: false });
-            checkRealtimeStatus();
-        }
+            // Вход
+            initEntry: async () => {
+                const name = document.getElementById('user-name').value.trim();
+                if (!name) return alert("Введите имя!");
+                
+                if (name.toLowerCase() === BOSS.toLowerCase() && document.getElementById('admin-password').value !== KEY) {
+                    return alert("ДОСТУП ЗАПРЕЩЕН: Неверный пароль Главы.");
+                }
 
-        function checkRealtimeStatus() {
-            db.collection("users").doc(session.name).onSnapshot(doc => {
-                if(!doc.exists) return clearAll();
-                const data = doc.data();
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                if(data.approved) startMain();
-                else document.getElementById('pending-screen').classList.add('active');
-            });
-        }
+                session.name = name;
+                localStorage.setItem('vault_user', name);
+                localStorage.setItem('vault_ava', session.avatar);
 
-        function startMain() {
-            document.getElementById('app-screen').classList.add('active');
-            document.getElementById('header-ava').src = session.avatar || 'https://api.dicebear.com/7.x/pixel-art/svg?seed=Family';
-            if(session.name.toLowerCase() === BOSS.toLowerCase()) {
-                session.isAdmin = true;
-                document.body.classList.add('is-admin');
-                document.getElementById('admin-gate').style.display = 'block';
-                loadRequests();
+                const ref = db.collection("users").doc(name);
+                const doc = await ref.get();
+                
+                if (!doc.exists) {
+                    await ref.set({ 
+                        name, 
+                        avatar: session.avatar, 
+                        approved: (name.toLowerCase() === BOSS.toLowerCase()), 
+                        typing: false,
+                        status: "В сети",
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    // Обновляем аватарку и время входа
+                    await ref.update({ 
+                        avatar: session.avatar,
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                // Логирование входа (только для админа потом видно)
+                App.logEntry(name);
+                
+                App.checkRealtimeStatus();
+            },
+
+            logEntry: (name) => {
+                db.collection("logs").add({
+                    user: name,
+                    time: firebase.firestore.FieldValue.serverTimestamp(),
+                    userAgent: navigator.userAgent
+                });
+            },
+
+            // Проверка статуса (одобрен/нет)
+            checkRealtimeStatus: () => {
+                db.collection("users").doc(session.name).onSnapshot(doc => {
+                    if (!doc.exists) return App.clearAll();
+                    const data = doc.data();
+                    
+                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                    
+                    if (data.approved) {
+                        App.startMain();
+                        // Обновляем локальный аватар если он изменился в БД
+                        if (data.avatar) session.avatar = data.avatar;
+                    } else {
+                        document.getElementById('pending-screen').classList.add('active');
+                    }
+                });
+            },
+
+            // Запуск основного интерфейса
+            startMain: () => {
+                document.getElementById('app-screen').classList.add('active');
+                document.getElementById('header-ava').src = session.avatar || 'https://api.dicebear.com/7.x/pixel-art/svg?seed=Fam';
+                document.getElementById('header-name').innerText = session.name;
+                
+                // Настройка админа
+                if (session.name.toLowerCase() === BOSS.toLowerCase()) {
+                    session.isAdmin = true;
+                    document.getElementById('admin-gate').classList.remove('hidden');
+                    Admin.listenRequests();
+                    Admin.listenLogs();
+                }
+
+                // Слушатели
+                Chat.listenMessages();
+                Chat.listenTyping();
+                Chat.listenPinned();
+                App.listenSelfStatus();
+            },
+
+            listenSelfStatus: () => {
+                db.collection("users").doc(session.name).onSnapshot(doc => {
+                    if(doc.exists) document.getElementById('header-status').innerText = doc.data().status || "";
+                });
+            },
+
+            clearAll: () => {
+                localStorage.clear();
+                location.reload();
+            },
+
+            // Авто-высота textarea
+            autoResize: (el) => {
+                el.style.height = 'auto';
+                el.style.height = el.scrollHeight + 'px';
+            },
+
+            // Анимация фона (Canvas)
+            initCanvas: () => {
+                const c = document.getElementById('bg-canvas');
+                const ctx = c.getContext('2d');
+                
+                let w, h, pts = [];
+
+                const resize = () => {
+                    w = c.width = window.innerWidth;
+                    h = c.height = window.innerHeight;
+                };
+                window.addEventListener('resize', resize);
+                resize();
+
+                for(let i=0; i<35; i++) {
+                    pts.push({
+                        x: Math.random()*w, y: Math.random()*h,
+                        vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
+                        r: Math.random()*2
+                    });
+                }
+
+                function anim() {
+                    ctx.clearRect(0,0,w,h);
+                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary');
+                    
+                    pts.forEach(p => {
+                        p.x+=p.vx; p.y+=p.vy;
+                        if(p.x<0||p.x>w) p.vx*=-1;
+                        if(p.y<0||p.y>h) p.vy*=-1;
+                        ctx.globalAlpha = 0.3;
+                        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+                    });
+                    requestAnimationFrame(anim);
+                }
+                anim();
             }
-            listenChat();
-            listenTyping();
-        }
+        };
 
-        // --- МЕДИА ЛОГИКА ---
-        async function sendMedia(event) {
-            const file = event.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                let content = e.target.result;
-                // Сжатие если это картинка
-                if(file.type.includes('image')) {
-                    content = await compressImg(content);
+        // =========================================
+        // 3. UI МЕНЕДЖЕР
+        // =========================================
+        const UI = {
+            toggleSearch: () => {
+                const bar = document.getElementById('search-bar');
+                const isActive = bar.style.display === 'flex';
+                bar.style.display = isActive ? 'none' : 'flex';
+                if (!isActive) document.getElementById('search-input').focus();
+                else {
+                    document.getElementById('search-input').value = "";
+                    Chat.filterMessages("");
                 }
+            },
+
+            toggleAttachMenu: () => {
+                const m = document.getElementById('attach-menu');
+                m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+            },
+
+            openSettings: () => {
+                document.getElementById('settings-modal').classList.add('active');
+                db.collection("users").doc(session.name).get().then(doc => {
+                    if(doc.exists) document.getElementById('status-input').value = doc.data().status || "";
+                });
+            },
+
+            saveStatus: () => {
+                const s = document.getElementById('status-input').value.trim();
+                db.collection("users").doc(session.name).update({ status: s });
+                UI.closeModals();
+            },
+
+            setTheme: (themeName) => {
+                document.documentElement.setAttribute('data-theme', themeName);
+                localStorage.setItem('vault_theme', themeName);
+                session.theme = themeName;
+                
+                document.querySelectorAll('.theme-opt').forEach(t => t.classList.remove('active'));
+                const activeBtn = document.querySelector(`.theme-opt[onclick*="${themeName}"]`);
+                if(activeBtn) activeBtn.classList.add('active');
+            },
+
+            openAdmin: () => { document.getElementById('admin-panel').classList.add('active'); },
+            
+            closeModals: () => {
+                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+                document.getElementById('context-menu').style.display = 'none';
+            },
+
+            openPollModal: () => {
+                UI.closeModals(); // close attach menu
+                document.getElementById('poll-modal').classList.add('active');
+                document.getElementById('poll-options').innerHTML = `
+                    <input type="text" class="poll-opt-input" placeholder="Вариант 1" style="margin-bottom:5px;">
+                    <input type="text" class="poll-opt-input" placeholder="Вариант 2" style="margin-bottom:5px;">
+                `;
+            },
+
+            addPollOption: () => {
+                const div = document.getElementById('poll-options');
+                if(div.children.length >= 6) return alert("Максимум 6 вариантов");
+                const inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'poll-opt-input';
+                inp.placeholder = `Вариант ${div.children.length + 1}`;
+                inp.style.marginBottom = '5px';
+                div.appendChild(inp);
+            },
+
+            switchAdminTab: (tab) => {
+                document.getElementById('admin-content-req').style.display = tab === 'req' ? 'block' : 'none';
+                document.getElementById('admin-content-logs').style.display = tab === 'logs' ? 'block' : 'none';
+            }
+        };
+
+        // =========================================
+        // 4. ЛОГИКА ЧАТА (MESSAGING)
+        // =========================================
+        const Chat = {
+            activeContextMsg: null, // ID сообщения для контекстного меню
+
+            // Отправка текста
+            sendText: async () => {
+                const inp = document.getElementById('msg-input');
+                const txt = inp.value.trim();
+                
+                if (!txt) return;
+
+                if (session.editingId) {
+                    // Редактирование
+                    await db.collection("messages").doc(session.editingId).update({
+                        text: txt,
+                        edited: true
+                    });
+                    Chat.cancelReply(); // Сброс режима (используем cancelReply для очистки UI)
+                    return;
+                }
+
+                const payload = {
+                    user: session.name,
+                    text: txt,
+                    time: firebase.firestore.FieldValue.serverTimestamp(),
+                    reactions: {}, // { "emoji": [users] } - упрощенно, лучше массив объектов
+                    type: 'text'
+                };
+
+                if (session.replyTo) {
+                    payload.replyTo = session.replyTo;
+                }
+
+                await db.collection("messages").add(payload);
+                
+                inp.value = "";
+                inp.style.height = 'auto';
+                Chat.cancelReply();
+                db.collection("users").doc(session.name).update({ typing: false });
+            },
+
+            // Отправка медиа
+            sendMedia: (event) => {
+                const file = event.target.files[0];
+                if(!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    let content = e.target.result;
+                    let type = file.type.startsWith('video') ? 'video' : 'image';
+
+                    // Сжатие если картинка
+                    if(type === 'image') content = await Chat.compressImg(content);
+
+                    await db.collection("messages").add({
+                        user: session.name,
+                        media: content,
+                        type: type,
+                        time: firebase.firestore.FieldValue.serverTimestamp(),
+                        reactions: {}
+                    });
+                    UI.toggleAttachMenu();
+                };
+                reader.readAsDataURL(file);
+            },
+
+            // Отправка Опроса
+            sendPoll: async () => {
+                const q = document.getElementById('poll-question').value.trim();
+                const opts = Array.from(document.querySelectorAll('.poll-opt-input'))
+                                .map(i => i.value.trim()).filter(v => v);
+
+                if (!q || opts.length < 2) return alert("Нужен вопрос и минимум 2 варианта");
+
+                // Структура: options: [ {id: 0, text: "Да", votes: ["user1", "user2"]} ]
+                const optionsData = opts.map((text, idx) => ({
+                    id: idx,
+                    text: text,
+                    votes: []
+                }));
+
                 await db.collection("messages").add({
                     user: session.name,
-                    media: content,
-                    type: file.type.split('/')[0], // 'image' или 'video'
-                    time: firebase.firestore.FieldValue.serverTimestamp()
+                    type: 'poll',
+                    question: q,
+                    options: optionsData,
+                    time: firebase.firestore.FieldValue.serverTimestamp(),
+                    reactions: {}
                 });
-            };
-            reader.readAsDataURL(file);
-        }
+                
+                UI.closeModals();
+            },
 
-        // Используем то имя, которое у тебя в HTML (onclick="toggleVoice()")
-async function toggleVoice() {
-    const btn = document.getElementById('voice-btn'); 
-    const status = document.getElementById('rec-status');
+            // Голосовалка
+            votePoll: async (msgId, optId) => {
+                const msgRef = db.collection("messages").doc(msgId);
+                
+                // Используем транзакцию для атомарности
+                db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(msgRef);
+                    if (!doc.exists) return;
 
-    if(!window.mediaRecorder || window.mediaRecorder.state === "inactive") {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            let type = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-            
-            window.mediaRecorder = new MediaRecorder(stream, { mimeType: type });
-            window.audioChunks = []; // Сделали глобальным через window
+                    let options = doc.data().options;
+                    const userName = session.name;
 
-            window.mediaRecorder.ondataavailable = e => window.audioChunks.push(e.data);
-            
-            window.mediaRecorder.onstop = async () => {
-                const blob = new Blob(window.audioChunks, { type: type });
+                    // Убираем голос из всех опций
+                    options.forEach(opt => {
+                        opt.votes = opt.votes.filter(u => u !== userName);
+                    });
+
+                    // Добавляем к выбранной
+                    options[optId].votes.push(userName);
+
+                    transaction.update(msgRef, { options: options });
+                });
+            },
+
+            // Голосовое
+            toggleVoice: async () => {
+                const btn = document.getElementById('voice-btn');
+                const status = document.getElementById('rec-status');
+                const timeLabel = document.getElementById('rec-time');
+
+                if (!mediaRecorder || mediaRecorder.state === "inactive") {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        mediaRecorder = new MediaRecorder(stream);
+                        audioChunks = [];
+                        
+                        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                        mediaRecorder.onstop = Chat.processVoice;
+
+                        mediaRecorder.start();
+                        
+                        // UI
+                        btn.style.color = "var(--danger)";
+                        status.style.display = "flex";
+                        let sec = 0;
+                        recInterval = setInterval(() => {
+                            sec++;
+                            let m = Math.floor(sec/60);
+                            let s = sec%60;
+                            timeLabel.innerText = `${m}:${s<10?'0':''}${s}`;
+                        }, 1000);
+
+                    } catch (err) { alert("Нет доступа к микрофону"); }
+                } else {
+                    mediaRecorder.stop();
+                    btn.style.color = "var(--text-dim)";
+                    status.style.display = "none";
+                    clearInterval(recInterval);
+                    timeLabel.innerText = "0:00";
+                }
+            },
+
+            processVoice: async () => {
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
                 const reader = new FileReader();
                 reader.readAsDataURL(blob);
                 reader.onloadend = async () => {
                     const base64 = reader.result;
-                    // Проверка на размер (Firebase Base64 лимит ~1mb)
-                    if(base64.length < 1048576) { 
-                        await db.collection("messages").add({ 
-                            user: session.name, 
-                            media: base64, 
-                            type: 'audio', 
-                            time: firebase.firestore.FieldValue.serverTimestamp() 
+                    if(base64.length < 1048576) {
+                        await db.collection("messages").add({
+                            user: session.name,
+                            media: base64,
+                            type: 'audio',
+                            time: firebase.firestore.FieldValue.serverTimestamp(),
+                            reactions: {}
                         });
-                    } else { alert("ГС слишком длинное, попробуй короче!"); }
+                    } else alert("Голосовое слишком длинное!");
                 };
-                stream.getTracks().forEach(t => t.stop());
-            };
+            },
 
-            window.mediaRecorder.start();
-            if(status) status.style.display = "block";
-            btn.style.color = "red";
-        } catch (err) {
-            alert("Доступ к микрофону отклонен или не поддерживается.");
-        }
-    } else {
-        window.mediaRecorder.stop();
-        if(status) status.style.display = "none";
-        btn.style.color = "var(--primary)";
-    }
-}
-        function compressImg(base64) {
-            return new Promise(res => {
-                const img = new Image();
-                img.src = base64;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let w = img.width, h = img.height;
-                    if(w > 800) { h = h * (800/w); w = 800; }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    res(canvas.toDataURL('image/jpeg', 0.6));
-                }
-            });
-        }
-
-        async function sendData() {
-            const inp = document.getElementById('msg-input');
-            if(!inp.value.trim()) return;
-            await db.collection("messages").add({
-                user: session.name,
-                text: inp.value.trim(),
-                time: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            inp.value = "";
-            db.collection("users").doc(session.name).update({ typing: false });
-        }
-
-        function listenChat() {
-            db.collection("messages").orderBy("time", "asc").onSnapshot(snap => {
-                const box = document.getElementById('chat-flow');
-                box.innerHTML = "";
-                snap.forEach(doc => {
-                    const m = doc.data();
-                    const isMe = m.user === session.name;
-                    let content = m.text || '';
-                    if(m.media) {
-                        if(m.type === 'image') content = `<img src="${m.media}" onclick="window.open('${m.media}')">`;
-                        else if(m.type === 'video') content = `<video src="${m.media}" controls></video>`;
-                        else if(m.type === 'audio') content = `<audio src="${m.media}" controls playsinline preload="metadata"></audio>`;
+            compressImg: (base64) => {
+                return new Promise(res => {
+                    const img = new Image();
+                    img.src = base64;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if(w > 1000) { h *= 1000/w; w = 1000; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        res(canvas.toDataURL('image/jpeg', 0.6));
                     }
-                    const html = `
-                        <div class="msg-block ${isMe ? 'me' : 'others'}">
-                            <span style="font-size:9px; color:var(--text-dim); margin:0 5px 2px;">${m.user}</span>
-                            <div class="bubble">
-                                ${content}
-                                ${session.isAdmin ? `<div class="del-ico" onclick="deleteItem('${doc.id}')">×</div>` : ''}
+                });
+            },
+
+            // Слушатель сообщений (Рендеринг)
+            listenMessages: () => {
+                db.collection("messages").orderBy("time", "asc").onSnapshot(snap => {
+                    const box = document.getElementById('chat-flow');
+                    
+                    // Чтобы не перерисовывать все, используем умную вставку, но для простоты в рамках одного файла будем чистить или добавлять.
+                    // Для стабильности при 1000 строк лучше полная перерисовка при удалении, и append при добавлении.
+                    // Здесь сделаем полную перерисовку для консистентности порядка.
+                    
+                    box.innerHTML = ""; 
+                    
+                    snap.forEach(doc => {
+                        const m = doc.data();
+                        const id = doc.id;
+                        const isMe = m.user === session.name;
+                        
+                        // Пропускаем удаленные локально (если фильтр)
+                        if (Chat.filterText && !Chat.matchFilter(m)) return;
+
+                        let content = "";
+                        
+                        // Обработка типов
+                        if (m.type === 'text') {
+                            content = m.text; // XSS protection is auto by innerText usually, but template literal needs care.
+                            // Simple linkify could go here
+                        } else if (m.type === 'image') {
+                            content = `<img src="${m.media}" onclick="window.open('${m.media}')">`;
+                        } else if (m.type === 'video') {
+                            content = `<video src="${m.media}" controls></video>`;
+                        } else if (m.type === 'audio') {
+                            content = `<audio src="${m.media}" controls></audio>`;
+                        } else if (m.type === 'poll') {
+                            content = Chat.renderPoll(m, id);
+                        }
+
+                        // Ответ (Reply)
+                        let replyHtml = "";
+                        if (m.replyTo) {
+                            // В реальном приложении надо бы искать сообщение в кэше, тут упростим
+                            replyHtml = `<div class="reply-context"><div class="reply-name">В ответ...</div>Нажмите, чтобы найти</div>`;
+                            // Мы могли бы хранить текст ответа в самом сообщении для простоты
+                            if(m.replyTo.user) { 
+                                replyHtml = `<div class="reply-context" onclick="Chat.scrollToMsg('${m.replyTo.id}')">
+                                    <div class="reply-name">${m.replyTo.user}</div>
+                                    ${m.replyTo.text}
+                                </div>`;
+                            }
+                        }
+
+                        // Реакции
+                        let reactionsHtml = "";
+                        let reactCount = 0;
+                        if (m.reactions) {
+                            for (let [emoji, users] of Object.entries(m.reactions)) {
+                                if(users.length > 0) {
+                                    reactionsHtml += `<span>${emoji} ${users.length}</span>`;
+                                    reactCount++;
+                                }
+                            }
+                        }
+                        const reactClass = reactCount > 0 ? "visible" : "";
+
+                        // Контекстное меню (Long press)
+                        const onContext = `oncontextmenu="Chat.openContext(event, '${id}', '${m.user}', '${m.type}', \`${m.text || ''}\`); return false;"`;
+                        
+                        // Тач события для свайпа
+                        const touchEvents = `ontouchstart="Chat.touchStart(event, '${id}', '${m.user}', \`${m.text || 'Вложение'}\`)" 
+                                             ontouchmove="Chat.touchMove(event)" 
+                                             ontouchend="Chat.touchEnd(event)"`;
+
+                        const html = `
+                            <div class="msg-wrapper ${isMe ? 'me' : 'others'}" id="msg-${id}" ${touchEvents}>
+                                <div class="sender-name">${m.user} ${session.isAdmin && !isMe ? `<i class="fas fa-shield-alt badge-admin"></i>` : ''}</div>
+                                <div class="bubble" ${onContext}>
+                                    ${replyHtml}
+                                    <div class="msg-content">${content}</div>
+                                    <div class="msg-meta">
+                                        ${m.edited ? '<span class="edited-mark">изм.</span>' : ''}
+                                        <span>${m.time ? new Date(m.time.seconds*1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '...'}</span>
+                                    </div>
+                                    <div class="reactions-bar ${reactClass}">${reactionsHtml}</div>
+                                </div>
                             </div>
-                        </div>`;
-                    box.insertAdjacentHTML('beforeend', html);
+                        `;
+                        box.insertAdjacentHTML('beforeend', html);
+                    });
+
+                    // Уведомление
+                    if (!document.hasFocus() && snap.docChanges.some(c => c.type === 'added' && c.doc.data().user !== session.name)) {
+                        new Notification("Новое сообщение в Family Vault");
+                    }
+
+                    // Скролл
+                    if (!Chat.filterText) box.scrollTop = box.scrollHeight;
                 });
-                box.scrollTop = box.scrollHeight;
-            });
-        }
+            },
 
-        function openAdmin() { document.getElementById('admin-panel').style.display = 'flex'; }
-        function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-
-        function loadRequests() {
-            db.collection("users").where("approved", "==", false).onSnapshot(snap => {
-                const list = document.getElementById('request-list');
-                list.innerHTML = snap.empty ? "<p>Нет заявок</p>" : "";
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    list.innerHTML += `<div style="display:flex; justify-content:space-between; background:var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:10px;">
-                        <span>${u.name}</span>
-                        <div>
-                            <button onclick="grant('${u.name}',true)" style="background:var(--success); border:none; border-radius:5px; padding:5px 10px;">OK</button>
-                            <button onclick="grant('${u.name}',false)" style="background:var(--danger); border:none; border-radius:5px; padding:5px 10px;">X</button>
+            renderPoll: (m, id) => {
+                let total = 0;
+                m.options.forEach(o => total += o.votes.length);
+                
+                let html = `<div class="poll-card"><div class="poll-title">${m.question}</div>`;
+                
+                m.options.forEach((opt, idx) => {
+                    const percent = total === 0 ? 0 : Math.round((opt.votes.length / total) * 100);
+                    const isVoted = opt.votes.includes(session.name);
+                    
+                    html += `
+                        <div class="poll-opt ${isVoted ? 'voted' : ''}" onclick="Chat.votePoll('${id}', ${idx})">
+                            <div class="poll-bar" style="width: ${percent}%"></div>
+                            <div class="poll-text">
+                                <span>${opt.text}</span>
+                                <span>${percent}%</span>
+                            </div>
                         </div>
-                    </div>`;
+                    `;
                 });
-            });
-        }
+                html += `<div style="text-align:right; font-size:10px; color:#888;">Всего голосов: ${total}</div></div>`;
+                return html;
+            },
 
-        function grant(n, ok) { ok ? db.collection("users").doc(n).update({ approved: true }) : db.collection("users").doc(n).delete(); }
-        function deleteItem(id) { if(confirm("Удалить?")) db.collection("messages").doc(id).delete(); }
-        function reportTyping() { 
-            db.collection("users").doc(session.name).update({ typing: true });
-            clearTimeout(window.t_tm); 
-            window.t_tm = setTimeout(() => db.collection("users").doc(session.name).update({ typing: false }), 3000);
-        }
-        function listenTyping() {
-            db.collection("users").where("typing", "==", true).onSnapshot(snap => {
-                const note = document.getElementById('typing-note');
-                let u = []; snap.forEach(d => { if(d.id !== session.name) u.push(d.id) });
-                note.style.opacity = u.length > 0 ? 1 : 0;
-                note.innerText = u.join(', ') + " печатает...";
-            });
-        }
-
-        function clearAll() { localStorage.clear(); location.reload(); }
-
-        function initCanvas() {
-            const c = document.getElementById('bg-canvas'); const ctx = c.getContext('2d');
-            c.width = window.innerWidth; c.height = window.innerHeight;
-            let pts = []; for(let i=0; i<30; i++) pts.push({x:Math.random()*c.width, y:Math.random()*c.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3});
-            function anim() {
-                ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = "rgba(0, 242, 255, 0.2)";
-                pts.forEach(p => {
-                    p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>c.width) p.vx*=-1; if(p.y<0||p.y>c.height) p.vy*=-1;
-                    ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
+            // --- FILTERING ---
+            filterText: "",
+            filterMessages: (val) => {
+                Chat.filterText = val.toLowerCase();
+                // Для простоты перезапускаем рендер (в реальном аппе скрывать классом hidden)
+                document.querySelectorAll('.msg-wrapper').forEach(el => {
+                    const text = el.innerText.toLowerCase();
+                    el.classList.toggle('hidden', !text.includes(Chat.filterText));
                 });
-                requestAnimationFrame(anim);
+            },
+
+            // --- CONTEXT ACTIONS ---
+            openContext: (e, id, user, type, text) => {
+                e.preventDefault();
+                Chat.activeContextMsg = { id, user, type, text };
+                
+                const menu = document.getElementById('context-menu');
+                menu.style.display = 'flex';
+                
+                // Позиционирование
+                let x = e.clientX;
+                let y = e.clientY;
+                if(x + 200 > window.innerWidth) x = window.innerWidth - 210;
+                if(y + 300 > window.innerHeight) y = window.innerHeight - 310;
+                
+                menu.style.left = x + 'px';
+                menu.style.top = y + 'px';
+
+                // Права
+                const isMe = user === session.name;
+                const isAdmin = session.isAdmin;
+                
+                document.getElementById('ctx-edit').style.display = isMe && type === 'text' ? 'flex' : 'none';
+                document.getElementById('ctx-del').style.display = (isMe || isAdmin) ? 'flex' : 'none';
+                document.getElementById('ctx-pin').style.display = isAdmin ? 'flex' : 'none';
+            },
+
+            react: async (emoji) => {
+                if(!Chat.activeContextMsg) return;
+                const ref = db.collection("messages").doc(Chat.activeContextMsg.id);
+                const doc = await ref.get();
+                if(doc.exists) {
+                    const data = doc.data();
+                    let reacts = data.reactions || {};
+                    let users = reacts[emoji] || [];
+                    
+                    if(users.includes(session.name)) {
+                        users = users.filter(u => u !== session.name);
+                    } else {
+                        users.push(session.name);
+                    }
+                    reacts[emoji] = users;
+                    await ref.update({ reactions: reacts });
+                }
+                document.getElementById('context-menu').style.display = 'none';
+            },
+
+            // --- EDIT & DELETE ---
+            deleteMessage: async () => {
+                if(confirm("Удалить сообщение?")) {
+                    await db.collection("messages").doc(Chat.activeContextMsg.id).delete();
+                }
+                document.getElementById('context-menu').style.display = 'none';
+            },
+
+            editMessageStart: () => {
+                const inp = document.getElementById('msg-input');
+                inp.value = Chat.activeContextMsg.text;
+                inp.focus();
+                session.editingId = Chat.activeContextMsg.id;
+                
+                // Меняем UI
+                document.querySelector('.send-btn i').className = "fas fa-check";
+                document.getElementById('context-menu').style.display = 'none';
+            },
+
+            // --- REPLY SYSTEM ---
+            initReplyFromContext: () => {
+                const { id, user, text } = Chat.activeContextMsg;
+                Chat.startReply(id, user, text);
+                document.getElementById('context-menu').style.display = 'none';
+            },
+
+            startReply: (id, user, text) => {
+                session.replyTo = { id, user, text: text.substring(0, 50) + (text.length>50?'...':'') };
+                document.getElementById('reply-preview').style.display = 'flex';
+                document.getElementById('reply-preview-content').innerHTML = `<span style="font-weight:700">${user}</span>: ${session.replyTo.text}`;
+                document.getElementById('msg-input').focus();
+            },
+
+            cancelReply: () => {
+                session.replyTo = null;
+                session.editingId = null;
+                document.getElementById('reply-preview').style.display = 'none';
+                document.querySelector('.send-btn i').className = "fas fa-paper-plane";
+            },
+
+            scrollToMsg: (id) => {
+                const el = document.getElementById(`msg-${id}`);
+                if(el) {
+                    el.scrollIntoView({behavior: "smooth", block: "center"});
+                    el.style.background = "rgba(255,255,255,0.1)";
+                    setTimeout(() => el.style.background = "transparent", 1000);
+                } else {
+                    alert("Сообщение слишком старое или не загружено");
+                }
+            },
+            
+            // --- PIN SYSTEM ---
+            pinMessageFromContext: () => {
+                db.collection("config").doc("main").set({ 
+                    pinnedId: Chat.activeContextMsg.id,
+                    pinnedText: Chat.activeContextMsg.text,
+                    pinnedAuthor: Chat.activeContextMsg.user
+                });
+                document.getElementById('context-menu').style.display = 'none';
+            },
+            
+            unpinMessage: (fromUi) => {
+                if(fromUi && !session.isAdmin) return;
+                db.collection("config").doc("main").update({ pinnedId: null, pinnedText: null });
+            },
+
+            listenPinned: () => {
+                db.collection("config").doc("main").onSnapshot(doc => {
+                    const data = doc.data();
+                    const con = document.getElementById('pinned-container');
+                    if(data && data.pinnedId) {
+                        con.style.display = 'flex';
+                        document.getElementById('pinned-text').innerText = `${data.pinnedAuthor}: ${data.pinnedText}`;
+                        con.onclick = () => Chat.scrollToMsg(data.pinnedId);
+                        // Показать кнопку удаления только админу
+                        document.getElementById('unpin-btn').style.display = session.isAdmin ? 'block' : 'none';
+                    } else {
+                        con.style.display = 'none';
+                    }
+                });
+            },
+
+            copyText: () => {
+                navigator.clipboard.writeText(Chat.activeContextMsg.text);
+                document.getElementById('context-menu').style.display = 'none';
+            },
+
+            // --- TYPING ---
+            reportTyping: () => {
+                db.collection("users").doc(session.name).update({ typing: true });
+                clearTimeout(window.t_tm);
+                window.t_tm = setTimeout(() => db.collection("users").doc(session.name).update({ typing: false }), 2000);
+            },
+            
+            listenTyping: () => {
+                db.collection("users").where("typing", "==", true).onSnapshot(snap => {
+                    const note = document.getElementById('typing-note');
+                    let u = [];
+                    snap.forEach(d => { if(d.id !== session.name) u.push(d.id) });
+                    note.style.opacity = u.length > 0 ? 1 : 0;
+                    note.innerText = u.length > 0 ? `${u.join(', ')} печатает...` : "";
+                });
+            },
+
+            // --- TOUCH SWIPE LOGIC ---
+            touchStartX: 0,
+            touchCurrentEl: null,
+            touchData: null,
+
+            touchStart: (e, id, user, text) => {
+                Chat.touchStartX = e.touches[0].clientX;
+                Chat.touchCurrentEl = e.currentTarget;
+                Chat.touchData = { id, user, text };
+                Chat.touchCurrentEl.classList.remove('swiping'); // сброс анимации
+            },
+
+            touchMove: (e) => {
+                if(!Chat.touchCurrentEl) return;
+                const diff = e.touches[0].clientX - Chat.touchStartX;
+                
+                // Логика свайпа вправо для ответа
+                if(diff > 0 && diff < 100) {
+                    Chat.touchCurrentEl.style.transform = `translateX(${diff}px)`;
+                }
+            },
+
+            touchEnd: (e) => {
+                if(!Chat.touchCurrentEl) return;
+                const diff = e.changedTouches[0].clientX - Chat.touchStartX;
+                
+                Chat.touchCurrentEl.classList.add('swiping'); // Включаем анимацию возврата
+                Chat.touchCurrentEl.style.transform = `translateX(0px)`;
+                
+                if(diff > 60) {
+                    // Trigger Reply
+                    // Виброотклик
+                    if(navigator.vibrate) navigator.vibrate(50);
+                    Chat.startReply(Chat.touchData.id, Chat.touchData.user, Chat.touchData.text);
+                }
+                
+                Chat.touchCurrentEl = null;
             }
-            anim();
-        }
+        };
+
+        // =========================================
+        // 5. ЛОГИКА АДМИНИСТРАТОРА
+        // =========================================
+        const Admin = {
+            listenRequests: () => {
+                db.collection("users").where("approved", "==", false).onSnapshot(snap => {
+                    const list = document.getElementById('request-list');
+                    list.innerHTML = snap.empty ? "<p style='text-align:center; color:#555;'>Нет заявок</p>" : "";
+                    snap.forEach(doc => {
+                        const u = doc.data();
+                        list.innerHTML += `
+                            <div class="req-item">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <img src="${u.avatar}" style="width:30px;height:30px;border-radius:10px;">
+                                    <span>${u.name}</span>
+                                </div>
+                                <div>
+                                    <button onclick="Admin.decide('${u.name}',true)" style="background:var(--success); color:#000; border:none; border-radius:5px; padding:5px 10px;">V</button>
+                                    <button onclick="Admin.decide('${u.name}',false)" style="background:var(--danger); color:#fff; border:none; border-radius:5px; padding:5px 10px;">X</button>
+                                </div>
+                            </div>`;
+                    });
+                });
+            },
+
+            listenLogs: () => {
+                // Лимит 20 последних логов
+                db.collection("logs").orderBy("time", "desc").limit(20).onSnapshot(snap => {
+                    const list = document.getElementById('log-list');
+                    list.innerHTML = "";
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const time = d.time ? new Date(d.time.seconds*1000).toLocaleString() : '-';
+                        // Вычленяем OS из userAgent для краткости
+                        let os = "Unknown";
+                        if(d.userAgent.includes("Windows")) os = "Win";
+                        if(d.userAgent.includes("Mac")) os = "Mac";
+                        if(d.userAgent.includes("Android")) os = "Android";
+                        if(d.userAgent.includes("iPhone")) os = "iOS";
+
+                        list.innerHTML += `
+                            <div class="log-row">
+                                <span>${d.user}</span> | ${time} | ${os}
+                            </div>
+                        `;
+                    });
+                });
+            },
+
+            decide: (n, ok) => {
+                if(ok) db.collection("users").doc(n).update({ approved: true });
+                else db.collection("users").doc(n).delete();
+            }
+        };
+
+        // Запуск
+        window.onload = App.init;
+
     </script>
 </body>
 </html>
