@@ -3,1107 +3,732 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Family Vault | OS</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>Family Vault OS | Security Edition</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
         /* ==========================================================================
-           1. CORE VARIABLES & ENGINE
-           ========================================================================== */
+           1. ДИЗАЙН-СИСТЕМА (CSS VARIABLES)
+           ========================================================================== 
+        */
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --primary-glow: rgba(59, 130, 246, 0.4);
+            --p-blue: #3b82f6;
+            --p-blue-dark: #1d4ed8;
+            --p-glow: rgba(59, 130, 246, 0.5);
+            
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --bg-input: #334155;
+            
+            --text-white: #f8fafc;
+            --text-dim: #94a3b8;
             
             --danger: #ef4444;
             --success: #10b981;
             --warning: #f59e0b;
             
-            --bg-body: #0f172a;
-            --bg-card: #1e293b;
-            --bg-input: #334155;
-            --bg-msg-in: #1e293b;
-            --bg-msg-out: #2563eb;
+            --radius-main: 24px;
+            --radius-msg: 18px;
             
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: 1px solid rgba(255,255,255,0.08);
-            
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --radius-xl: 28px;
-            
-            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -2px rgba(0,0,0,0.3);
-            
-            --safe-top: env(safe-area-inset-top, 20px);
-            --safe-bottom: env(safe-area-inset-bottom, 20px);
-            
-            --font-main: 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            
-            --z-back: 0;
-            --z-chat: 10;
-            --z-header: 50;
-            --z-drawer: 100;
-            --z-modal: 200;
-            --z-toast: 300;
-            --z-loader: 999;
+            --safe-t: env(safe-area-inset-top, 20px);
+            --safe-b: env(safe-area-inset-bottom, 20px);
+
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Light Theme Override */
         [data-theme="light"] {
-            --bg-body: #f1f5f9;
-            --bg-card: #ffffff;
+            --bg-dark: #f1f5f9;
+            --bg-panel: #ffffff;
             --bg-input: #e2e8f0;
-            --bg-msg-in: #ffffff;
-            --bg-msg-out: #3b82f6;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: 1px solid rgba(0,0,0,0.06);
-        }
-
-        /* OLED Theme Override */
-        [data-theme="oled"] {
-            --bg-body: #000000;
-            --bg-card: #111111;
-            --bg-input: #222222;
-            --border: 1px solid #333;
+            --text-white: #0f172a;
+            --text-dim: #64748b;
         }
 
         /* ==========================================================================
-           2. GLOBAL RESET & TYPOGRAPHY
-           ========================================================================== */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--bg-body); color: var(--text-main);
-            font-family: var(--font-main); overflow: hidden;
-            transition: background-color 0.4s ease, color 0.4s ease;
+           2. БАЗОВЫЕ СТИЛИ И СБРОС
+           ========================================================================== 
+        */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg-dark); color: var(--text-white);
+            font-family: 'Inter', sans-serif; overflow: hidden;
+            user-select: none;
         }
 
-        button, input, textarea { font-family: inherit; outline: none; border: none; }
-        a { text-decoration: none; color: inherit; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--p-blue); border-radius: 10px; }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        /* ==========================================================================
+           3. ЭКРАНЫ (SCREENS)
+           ========================================================================== 
+        */
+        .screen {
+            position: fixed; inset: 0; display: none;
+            flex-direction: column; z-index: 10;
+            background: var(--bg-dark);
+        }
+        .screen.active { display: flex; animation: fadeIn 0.4s ease; }
 
-        /* Utilities */
-        .hidden { display: none !important; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .center { align-items: center; justify-content: center; }
-        .full-screen { position: fixed; inset: 0; width: 100%; height: 100%; }
-        
-        /* Animations */
-        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 var(--primary-glow); } 70% { box-shadow: 0 0 0 10px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
 
         /* ==========================================================================
-           3. UI COMPONENTS
-           ========================================================================== */
-        
-        /* --- LOADER --- */
-        #global-loader {
-            background: var(--bg-body); z-index: var(--z-loader);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+           4. ЭКРАН ВХОДА И ЗАЯВКИ
+           ========================================================================== 
+        */
+        .auth-wrap {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 20px; background: radial-gradient(circle at top right, #1e1b4b, transparent);
         }
-        .loader-ring {
-            width: 50px; height: 50px; border: 4px solid var(--bg-input);
-            border-top: 4px solid var(--primary); border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin-bottom: 20px;
+        .auth-card {
+            width: 100%; max-width: 400px; background: var(--bg-panel);
+            padding: 40px 30px; border-radius: var(--radius-main);
+            box-shadow: var(--shadow-xl); text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* --- AUTH SCREEN --- */
-        #auth-screen {
-            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-body));
-            z-index: var(--z-chat); padding: 20px;
-            display: none; opacity: 0; transition: opacity 0.5s;
-        }
-        #auth-screen.active { display: flex; opacity: 1; }
-        
-        .auth-box {
-            width: 100%; max-width: 400px;
-            background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px);
-            border: var(--border); border-radius: 30px;
-            padding: 40px 30px; box-shadow: var(--shadow-lg);
-            text-align: center; transform: translateY(20px);
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        
-        .avatar-picker {
-            position: relative; width: 110px; height: 110px; margin: 0 auto 30px;
-            cursor: pointer; transition: transform 0.2s;
-        }
-        .avatar-picker:active { transform: scale(0.95); }
-        .avatar-picker img {
-            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-            border: 3px solid var(--primary); box-shadow: 0 0 20px var(--primary-glow);
-        }
-        .avatar-badge {
-            position: absolute; bottom: 5px; right: 5px;
-            background: var(--primary); color: white;
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: 3px solid var(--bg-card);
+        .auth-logo {
+            font-size: 42px; font-weight: 900; margin-bottom: 10px;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .input-group { position: relative; margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .modern-input {
+        .input-box { width: 100%; margin-bottom: 20px; text-align: left; }
+        .input-box label { display: block; margin-bottom: 8px; font-size: 12px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+        .input-ui {
             width: 100%; padding: 16px; background: var(--bg-input);
-            border: 2px solid transparent; border-radius: 16px;
-            color: var(--text-main); font-size: 16px; transition: 0.3s;
+            border-radius: 14px; border: 2px solid transparent;
+            color: white; font-size: 16px; transition: 0.3s;
         }
-        .modern-input:focus { border-color: var(--primary); background: var(--bg-body); }
+        .input-ui:focus { border-color: var(--p-blue); background: var(--bg-dark); }
 
-        .btn-main {
-            width: 100%; padding: 18px; border-radius: 16px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white; font-weight: 700; font-size: 16px;
-            box-shadow: 0 10px 25px -5px var(--primary-glow);
-            cursor: pointer; transition: 0.3s; margin-top: 10px;
+        .btn-ui {
+            width: 100%; padding: 18px; border-radius: 14px; border: none;
+            background: var(--p-blue); color: white; font-weight: 700; font-size: 16px;
+            cursor: pointer; box-shadow: 0 10px 20px var(--p-glow); transition: 0.2s;
         }
-        .btn-main:active { transform: scale(0.98); box-shadow: none; }
+        .btn-ui:active { transform: scale(0.97); }
 
-        /* --- APP LAYOUT --- */
-        #app-screen { display: none; flex-direction: column; }
-        #app-screen.active { display: flex; }
+        /* ЭКРАН ОЖИДАНИЯ (PENDING) */
+        #pending-screen {
+            justify-content: center; align-items: center; text-align: center; padding: 40px;
+        }
+        .loader-dots { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
+        .dot { width: 12px; height: 12px; background: var(--p-blue); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        /* HEADER */
+        /* ==========================================================================
+           5. ГЛАВНЫЙ ИНТЕРФЕЙС ЧАТА
+           ========================================================================== 
+        */
+        .app-container { display: flex; flex-direction: column; height: 100%; }
+
+        /* ШАПКА */
         .header {
-            height: calc(64px + var(--safe-top)); padding-top: var(--safe-top);
-            padding-left: 16px; padding-right: 16px;
-            display: flex; align-items: center; justify-content: space-between;
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
-            border-bottom: var(--border); position: relative; z-index: var(--z-header);
+            height: calc(65px + var(--safe-t)); padding-top: var(--safe-t);
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(15px);
+            display: flex; align-items: center; padding-left: 15px; padding-right: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100;
         }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .header-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-        
-        .chat-info { display: flex; flex-direction: column; }
-        .chat-title { font-weight: 700; font-size: 16px; line-height: 1.2; }
-        .chat-status { font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 6px; }
-        .status-indicator { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse-glow 2s infinite; }
+        .header-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--p-blue); object-fit: cover; }
+        .header-info { flex: 1; margin-left: 12px; }
+        .h-title { font-weight: 800; font-size: 17px; }
+        .h-status { font-size: 11px; color: var(--success); display: flex; align-items: center; gap: 5px; }
+        .pulse-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); }
 
-        .header-actions i {
-            font-size: 20px; color: var(--text-main); padding: 10px;
-            cursor: pointer; opacity: 0.8; transition: 0.2s;
-        }
-        .header-actions i:hover { opacity: 1; color: var(--primary); }
-
-        /* PINNED BAR */
-        #pinned-container {
-            background: rgba(59, 130, 246, 0.1); border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-            padding: 8px 16px; display: none; align-items: center; justify-content: space-between;
-            font-size: 13px; cursor: pointer; animation: fadeIn 0.3s;
-        }
-        .pinned-content { display: flex; align-items: center; gap: 10px; overflow: hidden; }
-        .pinned-line { width: 2px; height: 24px; background: var(--primary); border-radius: 2px; }
-        .pinned-text { display: flex; flex-direction: column; overflow: hidden; }
-        .pinned-label { font-size: 10px; color: var(--primary); font-weight: 700; }
-        .pinned-msg { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
-
-        /* CHAT AREA */
-        #chat-view {
-            flex: 1; overflow-y: scroll; padding: 20px 16px;
-            display: flex; flex-direction: column; gap: 6px;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+        /* СПИСОК СООБЩЕНИЙ */
+        #chat-flow {
+            flex: 1; overflow-y: auto; padding: 20px 15px;
+            display: flex; flex-direction: column; gap: 10px;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
         }
 
-        /* DATE DIVIDER */
-        .date-divider {
-            text-align: center; margin: 20px 0; position: relative;
-        }
-        .date-divider span {
-            background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 12px;
-            font-size: 11px; font-weight: 600; color: var(--text-muted);
-            backdrop-filter: blur(4px);
-        }
-
-        /* MESSAGE BUBBLES */
-        .msg-row {
-            display: flex; width: 100%; position: relative;
-            margin-bottom: 4px; animation: fadeIn 0.2s ease-out;
-        }
-        .msg-row.me { justify-content: flex-end; }
-        
-        /* Avatar for group chat logic */
-        .msg-avatar {
-            width: 28px; height: 28px; border-radius: 50%; margin-right: 8px;
-            align-self: flex-end; object-fit: cover; margin-bottom: 4px;
-        }
-        .msg-row.me .msg-avatar { display: none; }
+        .msg-row { display: flex; flex-direction: column; max-width: 80%; position: relative; }
+        .msg-row.me { align-self: flex-end; }
+        .msg-row.other { align-self: flex-start; }
 
         .bubble {
-            max-width: 75%; padding: 10px 14px; border-radius: 18px;
-            position: relative; font-size: 15px; line-height: 1.45;
-            box-shadow: var(--shadow-sm); word-wrap: break-word;
-        }
-        
-        .msg-row.other .bubble {
-            background: var(--bg-msg-in); color: var(--text-main);
-            border-bottom-left-radius: 4px; border: var(--border);
+            padding: 12px 16px; border-radius: var(--radius-msg);
+            font-size: 15px; line-height: 1.5; position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            user-select: text;
         }
         .msg-row.me .bubble {
-            background: var(--bg-msg-out); color: white;
-            border-bottom-right-radius: 4px;
+            background: linear-gradient(135deg, var(--p-blue) 0%, var(--p-blue-dark) 100%);
+            color: white; border-bottom-right-radius: 4px;
+        }
+        .msg-row.other .bubble {
+            background: var(--bg-panel); color: var(--text-white);
+            border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .sender-name {
-            font-size: 11px; font-weight: 700; color: var(--primary);
-            margin-bottom: 4px; display: block;
-        }
-        .msg-row.me .sender-name { display: none; }
+        .sender-name { font-size: 11px; font-weight: 800; color: var(--p-blue); margin-bottom: 4px; margin-left: 5px; }
+        .msg-time { font-size: 9px; opacity: 0.5; margin-top: 5px; text-align: right; font-family: 'JetBrains Mono'; }
 
-        /* Reply visualization inside bubble */
-        .reply-in-msg {
-            border-left: 2px solid rgba(255,255,255,0.5); background: rgba(0,0,0,0.1);
-            padding: 4px 8px; border-radius: 4px; margin-bottom: 6px; font-size: 12px;
-            cursor: pointer;
-        }
-        .reply-in-msg b { display: block; font-size: 11px; opacity: 0.8; }
-
-        .msg-meta {
-            display: flex; align-items: center; justify-content: flex-end; gap: 4px;
-            font-size: 10px; margin-top: 4px; opacity: 0.7;
-        }
-        
-        /* Media */
-        .msg-img {
-            max-width: 100%; border-radius: 12px; margin-top: 5px; cursor: pointer;
+        /* ЗАКРЕП */
+        #pin-bar {
+            background: rgba(59, 130, 246, 0.15); border-bottom: 1px solid var(--p-blue);
+            padding: 10px 15px; display: none; align-items: center; gap: 12px;
+            font-size: 13px; cursor: pointer;
         }
 
-        /* INPUT AREA */
-        #input-dock {
-            background: var(--bg-card); border-top: var(--border);
-            padding: 10px 16px calc(10px + var(--safe-bottom));
-            z-index: var(--z-header); position: relative;
+        /* ПОЛЕ ВВОДА */
+        .input-area {
+            background: var(--bg-panel); padding: 12px 15px calc(12px + var(--safe-b));
+            border-top: 1px solid rgba(255,255,255,0.05);
         }
-
-        #reply-preview {
-            display: none; align-items: center; justify-content: space-between;
-            padding: 8px 12px; background: var(--bg-body); border-left: 3px solid var(--primary);
-            margin-bottom: 10px; border-radius: 8px;
-        }
-
-        .input-bar { display: flex; align-items: flex-end; gap: 10px; }
-        
-        .attach-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted); cursor: pointer; transition: 0.2s;
-        }
-        .attach-btn:active { background: var(--bg-input); color: var(--text-main); }
-
-        .input-field-wrap {
+        .input-row { display: flex; align-items: flex-end; gap: 10px; }
+        .field-container {
             flex: 1; background: var(--bg-input); border-radius: 20px;
-            padding: 10px 15px; min-height: 42px; display: flex; align-items: center;
+            padding: 10px 15px; min-height: 44px; display: flex; align-items: center;
         }
         #msg-input {
-            width: 100%; background: transparent; color: var(--text-main);
-            font-size: 16px; resize: none; max-height: 120px; overflow-y: auto;
+            width: 100%; background: transparent; border: none; color: white;
+            font-size: 16px; max-height: 120px; resize: none;
         }
-        
-        #send-btn {
-            width: 42px; height: 42px; border-radius: 50%; background: var(--primary);
-            color: white; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; cursor: pointer; box-shadow: 0 4px 10px var(--primary-glow);
-            transition: transform 0.2s;
+        .circle-btn {
+            width: 44px; height: 44px; border-radius: 50%; background: var(--p-blue);
+            display: flex; align-items: center; justify-content: center; color: white;
+            box-shadow: 0 4px 12px var(--p-glow); cursor: pointer;
         }
-        #send-btn:active { transform: scale(0.9); }
-        #send-btn.disabled { background: var(--bg-input); color: var(--text-muted); box-shadow: none; pointer-events: none; }
 
-        /* --- DRAWER (Left Menu) --- */
-        .drawer-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
-            z-index: 99; opacity: 0; pointer-events: none; transition: 0.3s;
+        /* ==========================================================================
+           6. АДМИН-ПАНЕЛЬ (SECURITY HUB)
+           ========================================================================== 
+        */
+        #admin-panel {
+            position: fixed; inset: 0; background: var(--bg-dark); z-index: 500;
+            display: none; flex-direction: column; padding-top: var(--safe-t);
         }
-        .drawer-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .drawer {
-            position: fixed; top: 0; left: 0; bottom: 0; width: 80%; max-width: 320px;
-            background: var(--bg-card); z-index: var(--z-drawer);
-            transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; flex-direction: column; border-right: var(--border);
-        }
-        .drawer.active { transform: translateX(0); }
+        .admin-header { padding: 20px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        .admin-tabs { display: flex; background: var(--bg-panel); margin: 10px 20px; border-radius: 12px; padding: 5px; }
+        .tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .tab.active { background: var(--p-blue); color: white; }
 
-        .drawer-header {
-            padding: calc(30px + var(--safe-top)) 20px 30px;
-            background: linear-gradient(to bottom, var(--bg-body), var(--bg-card));
-            text-align: center; border-bottom: var(--border);
+        .request-card {
+            background: var(--bg-panel); margin: 10px 20px; padding: 15px;
+            border-radius: 16px; display: flex; align-items: center; gap: 15px;
+            animation: flipInX 0.5s;
         }
-        .drawer-ava { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; border: 3px solid var(--primary); }
-        .drawer-name { font-size: 20px; font-weight: 700; margin: 0; }
-        .drawer-uid { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 5px; }
+        .req-info { flex: 1; }
+        .req-actions { display: flex; gap: 10px; }
+        .btn-approve { background: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; }
+        .btn-ban { background: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; }
 
-        .drawer-menu { padding: 20px; flex: 1; overflow-y: auto; }
-        .menu-item {
-            display: flex; align-items: center; gap: 15px; padding: 15px;
-            border-radius: 12px; color: var(--text-main); font-weight: 500;
-            cursor: pointer; transition: 0.2s; margin-bottom: 5px;
-        }
-        .menu-item:active { background: var(--bg-input); }
-        .menu-item i { width: 24px; text-align: center; color: var(--text-muted); }
-        .menu-item.logout { color: var(--danger); margin-top: 20px; }
-        .menu-item.logout i { color: var(--danger); }
-
-        /* --- CONTEXT MENU (Right Click / Long Press) --- */
+        /* ==========================================================================
+           7. КОНТЕКСТНОЕ МЕНЮ И УВЕДОМЛЕНИЯ
+           ========================================================================== 
+        */
         #ctx-menu {
-            position: fixed; width: 220px; background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(16px); border: var(--border); border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: var(--z-modal);
-            display: none; overflow: hidden; transform-origin: top left;
-            animation: menuPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; width: 200px; background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px); border-radius: 15px; z-index: 1000;
+            display: none; box-shadow: var(--shadow-xl); border: 1px solid rgba(255,255,255,0.1);
         }
-        @keyframes menuPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .ctx-item {
-            padding: 14px 20px; display: flex; align-items: center; gap: 12px;
-            font-size: 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .ctx-item:last-child { border-bottom: none; }
+        .ctx-item { padding: 12px 15px; font-size: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .ctx-item:active { background: rgba(255,255,255,0.1); }
-        .ctx-item.danger { color: var(--danger); }
+        .ctx-item.del { color: var(--danger); }
 
-        /* --- TOAST NOTIFICATIONS --- */
-        #toast-container {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            z-index: var(--z-toast); display: flex; flex-direction: column; gap: 10px;
-            width: 90%; max-width: 350px; pointer-events: none;
-        }
         .toast {
-            background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px);
-            color: white; padding: 12px 20px; border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-size: 13px; text-align: center;
-            animation: slideUpFade 0.3s forwards; border: 1px solid rgba(255,255,255,0.1);
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 10px 20px;
+            border-radius: 20px; font-size: 13px; z-index: 2000; display: none;
         }
-        @keyframes slideUpFade { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* --- LIGHTBOX (Image Viewer) --- */
-        #lightbox {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            z-index: var(--z-modal); display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s;
-        }
-        #lightbox.active { opacity: 1; display: flex; }
-        #lightbox img { max-width: 100%; max-height: 90%; border-radius: 4px; box-shadow: 0 0 50px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s; }
-        #lightbox.active img { transform: scale(1); }
-        .lb-close { position: absolute; top: 30px; right: 30px; color: white; font-size: 30px; cursor: pointer; padding: 20px; }
 
     </style>
 </head>
 <body>
 
-    <div id="global-loader" class="full-screen">
-        <div class="loader-ring"></div>
-        <div style="font-weight:600; font-size:14px; letter-spacing:1px; opacity:0.7;">FAMILY VAULT</div>
-    </div>
-
-    <div id="auth-screen" class="full-screen center">
-        <div class="auth-box">
-            <h2 style="margin-bottom:5px;">Добро пожаловать</h2>
-            <p style="color:var(--text-muted); margin-bottom:30px;">Войдите в семейный канал</p>
-            
-            <div class="avatar-picker" onclick="document.getElementById('file-ava').click()">
-                <img id="auth-preview" src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix">
-                <div class="avatar-badge"><i class="fas fa-camera"></i></div>
-                <input type="file" id="file-ava" hidden accept="image/*" onchange="previewAuth(this)">
-            </div>
-
-            <div class="input-group">
-                <label>Ваше Имя</label>
-                <input type="text" id="login-user" class="modern-input" placeholder="Например: Артем" oninput="checkAdmin(this.value)">
-            </div>
-
-            <div class="input-group" id="pass-group" style="display:none;">
-                <label>Пароль Админа</label>
-                <input type="password" id="login-pass" class="modern-input" placeholder="••••••••">
-            </div>
-
-            <button class="btn-main" onclick="app.login()">Войти</button>
-            <p style="margin-top:20px; font-size:12px; opacity:0.5;">Данные сохраняются локально</p>
+    <div id="loading-screen" class="screen active center" style="justify-content:center; align-items:center;">
+        <div class="auth-logo">VAULT</div>
+        <div class="loader-dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
     </div>
 
-    <div id="app-screen" class="full-screen">
-        <header class="header">
-            <div class="header-left" onclick="ui.toggleDrawer(true)">
-                <i class="fas fa-bars" style="font-size:20px;"></i>
-                <img id="header-ava-img" class="header-avatar" src="">
-                <div class="chat-info">
-                    <div class="chat-title">Семья</div>
-                    <div class="chat-status"><div class="status-indicator"></div> <span id="online-stat">Подключение...</span></div>
-                </div>
-            </div>
-            <div class="header-actions">
-                <i class="fas fa-search" onclick="ui.toggleSearch()"></i>
-            </div>
-        </header>
-
-        <div id="pinned-container" onclick="chat.scrollToPinned()">
-            <div class="pinned-content">
-                <div class="pinned-line"></div>
-                <div class="pinned-text">
-                    <span class="pinned-label">Закрепленное сообщение</span>
-                    <span class="pinned-msg" id="pinned-body">Загрузка...</span>
-                </div>
-            </div>
-            <i class="fas fa-times" style="padding:10px; opacity:0.5;" onclick="admin.unpin(event)"></i>
-        </div>
-
-        <div id="search-bar" style="background:var(--bg-card); padding:10px; display:none; border-bottom:var(--border);">
-            <input type="text" id="search-inp" class="modern-input" style="padding:10px;" placeholder="Поиск по истории..." oninput="chat.search(this.value)">
-        </div>
-
-        <div id="chat-view">
-            <div style="text-align:center; margin-top:50px; opacity:0.3;">
-                <i class="fas fa-lock" style="font-size:40px; margin-bottom:10px;"></i>
-                <p>История зашифрована<br>и синхронизирована</p>
-            </div>
-        </div>
-
-        <div id="input-dock">
-            <div id="reply-preview">
-                <div>
-                    <span style="color:var(--primary); font-size:11px; font-weight:bold;">Ответ:</span>
-                    <span id="reply-target-name" style="font-weight:bold; font-size:12px; margin-left:5px;">Name</span>
-                    <div id="reply-target-text" style="font-size:12px; color:var(--text-muted);">Text</div>
-                </div>
-                <i class="fas fa-times" onclick="chat.cancelReply()" style="padding:10px;"></i>
-            </div>
-
-            <div class="input-bar">
-                <label for="file-msg" class="attach-btn"><i class="fas fa-paperclip"></i></label>
-                <input type="file" id="file-msg" hidden onchange="chat.sendFile(this)">
+    <div id="auth-screen" class="screen">
+        <div class="auth-wrap">
+            <div class="auth-card">
+                <div class="auth-logo">VAULT</div>
+                <p style="color:var(--text-dim); margin-bottom:30px;">Система защищенной связи</p>
                 
-                <div class="input-field-wrap">
-                    <textarea id="msg-input" placeholder="Сообщение..." rows="1"></textarea>
+                <div style="margin-bottom:20px; position:relative; display:inline-block;">
+                    <img id="p-ava" src="https://api.dicebear.com/7.x/notionists/svg?seed=Lucky" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--p-blue);">
+                    <label for="f-ava" style="position:absolute; bottom:0; right:0; background:var(--p-blue); width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="fas fa-camera" style="font-size:12px;"></i></label>
+                    <input type="file" id="f-ava" hidden accept="image/*" onchange="ui.previewAva(this)">
                 </div>
-                
-                <div id="send-btn" class="disabled" onclick="chat.send()">
-                    <i class="fas fa-paper-plane"></i>
+
+                <div class="input-box">
+                    <label>Ваше Имя</label>
+                    <input type="text" id="in-name" class="input-ui" placeholder="Введите имя..." oninput="logic.checkBoss(this.value)">
+                </div>
+
+                <div id="admin-pass-box" class="input-box" style="display:none;">
+                    <label>Ключ Администратора</label>
+                    <input type="password" id="in-pass" class="input-ui" placeholder="••••••••">
+                </div>
+
+                <button class="btn-ui" onclick="logic.requestAccess()">Войти / Подать заявку</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pending-screen" class="screen">
+        <i class="fas fa-shield-halved" style="font-size:60px; color:var(--warning); margin-bottom:20px;"></i>
+        <h2>Доступ ограничен</h2>
+        <p style="color:var(--text-dim); max-width:280px;">Твоя заявка отправлена <b>Денису</b>. Подожди, пока он одобрит вход.</p>
+        <div class="loader-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <button class="btn-ui" style="width:auto; background:transparent; box-shadow:none; color:var(--danger);" onclick="logic.logout()">Отменить заявку</button>
+    </div>
+
+    <div id="banned-screen" class="screen center" style="justify-content:center; align-items:center; text-align:center; padding:20px;">
+        <i class="fas fa-user-slash" style="font-size:80px; color:var(--danger); margin-bottom:20px;"></i>
+        <h1 style="color:var(--danger);">ТЫ В БАНЕ</h1>
+        <p>Доступ к этому хранилищу для тебя закрыт навсегда.</p>
+    </div>
+
+    <div id="app-screen" class="screen">
+        <div class="app-container">
+            <header class="header">
+                <i class="fas fa-bars" style="font-size:20px; margin-right:15px; cursor:pointer;" onclick="ui.toggleDrawer()"></i>
+                <img id="h-ava" class="header-avatar" src="">
+                <div class="header-info">
+                    <div class="h-title">Семейный Склеп</div>
+                    <div class="h-status"><div class="pulse-dot"></div> <span id="online-count">1 в сети</span></div>
+                </div>
+                <div class="h-actions">
+                    <i class="fas fa-shield-heart" id="admin-icon" style="display:none; color:var(--warning); font-size:22px; cursor:pointer;" onclick="ui.openAdmin()"></i>
+                </div>
+            </header>
+
+            <div id="pin-bar" onclick="logic.jumpToPin()">
+                <i class="fas fa-thumbtack" style="color:var(--p-blue);"></i>
+                <div id="pin-txt" style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Закрепленное сообщение...</div>
+                <i class="fas fa-times" onclick="logic.unpin(event)"></i>
+            </div>
+
+            <div id="chat-flow">
+                </div>
+
+            <div class="input-area">
+                <div id="reply-box" style="display:none; background:rgba(0,0,0,0.2); padding:8px; border-radius:10px; margin-bottom:10px; border-left:3px solid var(--p-blue);">
+                    <div style="font-size:11px; font-weight:700; color:var(--p-blue);">Ответ пользователю <span id="reply-name"></span></div>
+                    <div id="reply-text" style="font-size:12px; opacity:0.7; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></div>
+                </div>
+                <div class="input-row">
+                    <label for="f-msg" class="circle-btn" style="background:var(--bg-input); box-shadow:none;"><i class="fas fa-plus"></i></label>
+                    <input type="file" id="f-msg" hidden onchange="logic.sendMedia(this)">
+                    
+                    <div class="field-container">
+                        <textarea id="msg-input" placeholder="Написать..." rows="1" oninput="ui.autoResize(this)"></textarea>
+                    </div>
+
+                    <div id="send-btn" class="circle-btn" onclick="logic.sendText()">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="drawer-overlay" onclick="ui.toggleDrawer(false)"></div>
-    <div class="drawer">
-        <div class="drawer-header">
-            <img id="drawer-ava" class="drawer-ava" src="">
-            <h3 id="drawer-name" class="drawer-name">User</h3>
-            <div id="drawer-uid" class="drawer-uid">ID: 0000</div>
+    <div id="admin-panel">
+        <div class="admin-header">
+            <h3>Управление Доступом</h3>
+            <i class="fas fa-times" style="font-size:24px; cursor:pointer;" onclick="ui.closeAdmin()"></i>
         </div>
-        <div class="drawer-menu">
-            <div class="menu-item" onclick="ui.cycleTheme()">
-                <i class="fas fa-palette"></i> Тема оформления
-            </div>
-            <div class="menu-item" onclick="alert('Все фото сохраняются в облаке Firebase')">
-                <i class="fas fa-image"></i> Медиа
-            </div>
-            <div class="menu-item" id="admin-btn" style="display:none; color:#f59e0b;" onclick="admin.panel()">
-                <i class="fas fa-shield-alt"></i> Админ панель
-            </div>
-            <div class="menu-item logout" onclick="app.logout()">
-                <i class="fas fa-sign-out-alt"></i> Выйти
-            </div>
+        <div class="admin-tabs">
+            <div class="tab active" onclick="ui.switchTab('reqs')">Заявки (<span id="req-count">0</span>)</div>
+            <div class="tab" onclick="ui.switchTab('users')">Участники</div>
         </div>
-        <div style="padding:20px; font-size:10px; color:var(--text-muted); text-align:center;">
-            Family Vault v4.2.0 (Ultimate)<br>Secure Connection
-        </div>
+        <div id="admin-content" style="flex:1; overflow-y:auto;">
+            </div>
     </div>
 
     <div id="ctx-menu">
-        <div class="ctx-item" onclick="chat.triggerReply()"><i class="fas fa-reply" style="width:20px;"></i> Ответить</div>
-        <div class="ctx-item" onclick="chat.copyText()"><i class="fas fa-copy" style="width:20px;"></i> Копировать</div>
-        <div class="ctx-item" id="ctx-pin" style="display:none;" onclick="admin.triggerPin()"><i class="fas fa-thumbtack" style="width:20px;"></i> Закрепить</div>
-        <div class="ctx-item danger" id="ctx-del" onclick="chat.deleteMsg()"><i class="fas fa-trash" style="width:20px;"></i> Удалить</div>
+        <div class="ctx-item" onclick="logic.ctxReply()"><i class="fas fa-reply"></i> Ответить</div>
+        <div class="ctx-item" id="ctx-pin-btn" onclick="logic.ctxPin()"><i class="fas fa-thumbtack"></i> Закрепить</div>
+        <div class="ctx-item del" id="ctx-del-btn" onclick="logic.ctxDelete()"><i class="fas fa-trash"></i> Удалить</div>
     </div>
 
-    <div id="lightbox" onclick="this.classList.remove('active')">
-        <div class="lb-close">&times;</div>
-        <img id="lb-img" src="">
-    </div>
-
-    <div id="toast-container"></div>
+    <div class="toast" id="toast"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 
     <script>
         /**
-         * =======================================================
-         * FAMILY VAULT CORE | ULTIMATE EDITION
-         * =======================================================
+         * ====================================================================
+         * VAULT OS CORE ENGINE
+         * ====================================================================
          */
 
-        // --- CONFIGURATION ---
-        const CONFIG = {
+        const config = {
+            apiKey: "AIzaSyACp_gVvnpgF_P_0YpKXR5E8QeSTcLEA88",
+            projectId: "familychat-4125b",
             adminName: "Денис",
-            adminPass: "qwaszx12",
-            presenceInterval: 60000,
-            firebase: {
-                apiKey: "AIzaSyACp_gVvnpgF_P_0YpKXR5E8QeSTcLEA88",
-                authDomain: "familychat-4125b.firebaseapp.com",
-                projectId: "familychat-4125b",
-                storageBucket: "familychat-4125b.firebasestorage.app",
-                messagingSenderId: "558123147956",
-                appId: "1:558123147956:web:313a729de8d6dff4fa2de1"
+            adminKey: "qwaszx12"
+        };
+
+        firebase.initializeApp({
+            apiKey: config.apiKey,
+            authDomain: config.projectId + ".firebaseapp.com",
+            projectId: config.projectId,
+            storageBucket: config.projectId + ".appspot.com"
+        });
+
+        const db = firebase.firestore();
+        
+        // Глобальное состояние
+        let user = JSON.parse(localStorage.getItem('vault_user')) || null;
+        let activeTab = 'reqs';
+        let replyData = null;
+        let currentCtxId = null;
+
+        const ui = {
+            showScreen: (id) => {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+            },
+            
+            toast: (txt) => {
+                const t = document.getElementById('toast');
+                t.innerText = txt;
+                t.style.display = 'block';
+                setTimeout(() => t.style.display = 'none', 2000);
+            },
+
+            previewAva: (input) => {
+                const reader = new FileReader();
+                reader.onload = e => document.getElementById('p-ava').src = e.target.result;
+                reader.readAsDataURL(input.files[0]);
+            },
+
+            autoResize: (el) => {
+                el.style.height = 'auto';
+                el.style.height = el.scrollHeight + 'px';
+            },
+
+            openAdmin: () => document.getElementById('admin-panel').style.display = 'flex',
+            closeAdmin: () => document.getElementById('admin-panel').style.display = 'none',
+
+            switchTab: (tab) => {
+                activeTab = tab;
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                event.target.classList.add('active');
+                logic.renderAdmin();
             }
         };
 
-        // Initialize Firebase
-        firebase.initializeApp(CONFIG.firebase);
-        const db = firebase.firestore();
-
-        // --- GLOBAL STATE ---
-        const state = {
-            user: JSON.parse(localStorage.getItem('fv_user_v4')) || null,
-            theme: localStorage.getItem('fv_theme') || 'dark',
-            ctxMsgId: null,
-            replyTo: null,
-            longPressTimer: null,
-            isMobile: /Android|iPhone|iPad/i.test(navigator.userAgent)
-        };
-
-        // --- APP CONTROLLER ---
-        const app = {
-            init: () => {
-                ui.applyTheme();
-                if (state.user) {
-                    app.loadMain();
+        const logic = {
+            init: async () => {
+                if (!user) {
+                    ui.showScreen('auth-screen');
                 } else {
-                    document.getElementById('global-loader').style.display = 'none';
-                    document.getElementById('auth-screen').classList.add('active');
+                    logic.verifyStatus();
                 }
             },
 
-            login: async () => {
-                const nameInp = document.getElementById('login-user');
-                const passInp = document.getElementById('login-pass');
-                const avaSrc = document.getElementById('auth-preview').src;
-                
-                const name = nameInp.value.trim();
-                
-                if(!name) return ui.toast("Введите имя!", "error");
+            checkBoss: (val) => {
+                const box = document.getElementById('admin-pass-box');
+                box.style.display = (val.trim().toLowerCase() === config.adminName.toLowerCase()) ? 'block' : 'none';
+            },
+
+            requestAccess: async () => {
+                const name = document.getElementById('in-name').value.trim();
+                const pass = document.getElementById('in-pass').value.trim();
+                const ava = document.getElementById('p-ava').src;
+
+                if (!name) return ui.toast("Введите имя");
 
                 let isAdmin = false;
-                if(name.toLowerCase() === CONFIG.adminName.toLowerCase()) {
-                    if(passInp.value !== CONFIG.adminPass) {
-                        return ui.toast("Неверный пароль администратора", "error");
-                    }
+                if (name.toLowerCase() === config.adminName.toLowerCase()) {
+                    if (pass !== config.adminKey) return ui.toast("Неверный ключ админа");
                     isAdmin = true;
                 }
 
-                const userObj = {
-                    name: name,
-                    ava: avaSrc,
-                    id: name.toLowerCase().replace(/\s/g, '_') + '_' + Date.now().toString().slice(-4),
-                    isAdmin: isAdmin
+                const uid = name.toLowerCase() + "_" + Math.floor(Math.random() * 1000);
+                const userData = {
+                    uid, name, ava, isAdmin,
+                    status: isAdmin ? 'approved' : 'pending',
+                    lastSeen: Date.now()
                 };
 
-                localStorage.setItem('fv_user_v4', JSON.stringify(userObj));
-                state.user = userObj;
-
-                // Animation out
-                document.getElementById('auth-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('auth-screen').classList.remove('active');
-                    app.loadMain();
-                }, 500);
-            },
-
-            loadMain: () => {
-                document.getElementById('global-loader').style.display = 'none';
-                document.getElementById('app-screen').classList.add('active');
+                // Сохраняем в Firebase
+                await db.collection('vault_users').doc(uid).set(userData);
                 
-                // Populate UI
-                document.getElementById('header-ava-img').src = state.user.ava;
-                document.getElementById('drawer-ava').src = state.user.ava;
-                document.getElementById('drawer-name').innerText = state.user.name;
-                document.getElementById('drawer-uid').innerText = "ID: " + state.user.id.split('_')[0];
-                
-                if(state.user.isAdmin) document.getElementById('admin-btn').style.display = 'flex';
-
-                // Start Systems
-                chat.listen();
-                presence.start();
-                admin.listenPinned();
-
-                ui.toast(`Добро пожаловать, ${state.user.name}`);
+                user = userData;
+                localStorage.setItem('vault_user', JSON.stringify(user));
+                logic.verifyStatus();
             },
 
-            logout: () => {
-                if(confirm("Выйти из аккаунта?")) {
-                    localStorage.removeItem('fv_user_v4');
-                    location.reload();
-                }
-            }
-        };
-
-        // --- UI CONTROLLER ---
-        const ui = {
-            toast: (msg, type = "info") => {
-                const con = document.getElementById('toast-container');
-                const el = document.createElement('div');
-                el.className = 'toast';
-                el.innerText = msg;
-                if(type === 'error') el.style.border = "1px solid var(--danger)";
-                con.appendChild(el);
-                setTimeout(() => el.remove(), 3000);
-            },
-
-            toggleDrawer: (show) => {
-                const d = document.querySelector('.drawer');
-                const o = document.querySelector('.drawer-overlay');
-                if(show) { d.classList.add('active'); o.classList.add('active'); }
-                else { d.classList.remove('active'); o.classList.remove('active'); }
-            },
-
-            toggleSearch: () => {
-                const s = document.getElementById('search-bar');
-                s.style.display = (s.style.display === 'none') ? 'block' : 'none';
-                if(s.style.display === 'block') document.getElementById('search-inp').focus();
-            },
-
-            cycleTheme: () => {
-                const themes = ['dark', 'light', 'oled'];
-                const cur = state.theme;
-                const next = themes[(themes.indexOf(cur) + 1) % themes.length];
-                state.theme = next;
-                localStorage.setItem('fv_theme', next);
-                ui.applyTheme();
-                ui.toast("Тема: " + next.toUpperCase());
-            },
-
-            applyTheme: () => {
-                document.body.setAttribute('data-theme', state.theme);
-            },
-
-            lightbox: (src) => {
-                const lb = document.getElementById('lightbox');
-                document.getElementById('lb-img').src = src;
-                lb.classList.add('active');
-            }
-        };
-
-        // --- CHAT ENGINE ---
-        const chat = {
-            listen: () => {
-                const view = document.getElementById('chat-view');
-                // Clear initial placeholder
-                view.innerHTML = '';
-
-                db.collection('msgs').orderBy('ts', 'asc').onSnapshot(snap => {
-                    snap.docChanges().forEach(change => {
-                        if(change.type === 'added') chat.render(change.doc);
-                        if(change.type === 'modified') chat.update(change.doc);
-                        if(change.type === 'removed') chat.remove(change.doc.id);
-                    });
+            // ГЛАВНАЯ ПРОВЕРКА БЕЗОПАСНОСТИ
+            verifyStatus: () => {
+                db.collection('vault_users').doc(user.uid).onSnapshot(doc => {
+                    if (!doc.exists) {
+                        logic.logout();
+                        return;
+                    }
+                    const d = doc.data();
+                    if (d.status === 'banned') ui.showScreen('banned-screen');
+                    else if (d.status === 'pending') ui.showScreen('pending-screen');
+                    else if (d.status === 'approved') {
+                        ui.showScreen('app-screen');
+                        logic.startApp();
+                    }
                 });
             },
 
-            render: (doc) => {
+            startApp: () => {
+                document.getElementById('h-ava').src = user.ava;
+                if (user.isAdmin) {
+                    document.getElementById('admin-icon').style.display = 'block';
+                    logic.listenAdminData();
+                }
+                logic.listenMessages();
+                logic.listenPresence();
+                logic.listenPins();
+                setInterval(logic.updatePresence, 30000);
+            },
+
+            listenMessages: () => {
+                const flow = document.getElementById('chat-flow');
+                db.collection('vault_msgs').orderBy('ts', 'asc').limitToLast(50).onSnapshot(snap => {
+                    snap.docChanges().forEach(change => {
+                        if (change.type === 'added') logic.renderMsg(change.doc);
+                        if (change.type === 'removed') document.getElementById('msg-' + change.doc.id)?.remove();
+                    });
+                    flow.scrollTop = flow.scrollHeight;
+                });
+            },
+
+            renderMsg: (doc) => {
                 const d = doc.data();
                 const id = doc.id;
-                const view = document.getElementById('chat-view');
-                const isMe = d.u === state.user.name;
+                const isMe = d.author_uid === user.uid;
+                const flow = document.getElementById('chat-flow');
 
-                // Date Separator Logic
-                const msgDate = d.ts ? d.ts.toDate() : new Date();
-                const dateStr = msgDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-                
-                const lastMsg = view.lastElementChild;
-                let lastDate = null;
-                if (lastMsg && lastMsg.dataset.date) lastDate = lastMsg.dataset.date;
-
-                if (dateStr !== lastDate) {
-                    const div = document.createElement('div');
-                    div.className = 'date-divider';
-                    div.innerHTML = `<span>${dateStr}</span>`;
-                    view.appendChild(div);
-                }
-
-                // Construct Content
-                let body = '';
-                
-                // Reply Block
-                if(d.reply) {
-                    body += `<div class="reply-in-msg"><b>${d.reply.u}</b>${d.reply.t==='text' ? d.reply.c : '[Медиа]'}</div>`;
-                }
-
-                // Main Content
-                if(d.deleted) {
-                    body += `<span style="font-style:italic; opacity:0.6; font-size:13px;"><i class="fas fa-ban"></i> Сообщение удалено</span>`;
-                } else {
-                    if(d.t === 'text') {
-                        // Linkify could go here
-                        body += `<span>${d.c}</span>`;
-                    } else if (d.t === 'img') {
-                        body += `<img src="${d.c}" class="msg-img" onclick="ui.lightbox(this.src)">`;
-                    }
-                }
-
-                // Meta
-                const time = msgDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                const meta = `
-                    <div class="msg-meta">
-                        ${d.pinned ? '<i class="fas fa-thumbtack" style="color:#fbbf24;"></i>' : ''}
-                        ${time}
-                    </div>
-                `;
-
-                // Wrapper
                 const row = document.createElement('div');
                 row.className = `msg-row ${isMe ? 'me' : 'other'}`;
-                row.id = `msg-${id}`;
-                row.dataset.date = dateStr;
-                row.dataset.raw = JSON.stringify(d); // Store data for context menu
+                row.id = 'msg-' + id;
 
-                // Avatar for others
-                let avatarHTML = '';
-                if(!isMe) {
-                    // Try to find user avatar logic (skipped for brevity, using generic)
-                    // We can store avatar in msg for simplicity
-                    const ava = d.ava || "https://api.dicebear.com/7.x/notionists/svg?seed=" + d.u;
-                    avatarHTML = `<img src="${ava}" class="msg-avatar">`;
+                let content = '';
+                if (d.reply) {
+                    content += `<div style="font-size:10px; opacity:0.6; border-left:2px solid var(--p-blue); padding-left:5px; margin-bottom:5px;">
+                        <b>${d.reply.name}:</b> ${d.reply.text}
+                    </div>`;
                 }
 
+                if (d.type === 'text') content += `<div>${d.body}</div>`;
+                else if (d.type === 'img') content += `<img src="${d.body}" style="width:100%; border-radius:10px; margin-top:5px;" onclick="window.open(this.src)">`;
+
+                const time = d.ts ? new Date(d.ts.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '--:--';
+
                 row.innerHTML = `
-                    ${avatarHTML}
+                    ${!isMe ? `<div class="sender-name">${d.author}</div>` : ''}
                     <div class="bubble">
-                        <span class="sender-name">${d.u}</span>
-                        ${body}
-                        ${meta}
+                        ${content}
+                        <div class="msg-time">${time} ${d.pinned ? '📌' : ''}</div>
                     </div>
                 `;
 
-                // Interaction Handlers (Long Press / Context)
-                const bubble = row.querySelector('.bubble');
-                chat.attachEvents(bubble, id, isMe, d.pinned);
-
-                view.appendChild(row);
-                view.scrollTop = view.scrollHeight;
-            },
-
-            update: (doc) => {
-                const el = document.getElementById(`msg-${doc.id}`);
-                if(el) {
-                    // Simple hack: Re-render is safer but replacing innerHTML of bubble works for delete
-                    const d = doc.data();
-                    if(d.deleted) {
-                        el.querySelector('.bubble').innerHTML = `<span style="font-style:italic; opacity:0.6;"><i class="fas fa-ban"></i> Удалено</span>`;
-                    }
-                    if(d.pinned) {
-                        if(!el.querySelector('.fa-thumbtack')) el.querySelector('.msg-meta').insertAdjacentHTML('afterbegin', '<i class="fas fa-thumbtack" style="color:#fbbf24;"></i>');
-                    } else {
-                        const icon = el.querySelector('.fa-thumbtack');
-                        if(icon) icon.remove();
-                    }
-                    // Update stored data
-                    el.dataset.raw = JSON.stringify(d);
-                }
-            },
-
-            remove: (id) => {
-                const el = document.getElementById(`msg-${id}`);
-                if(el) el.remove();
-            },
-
-            attachEvents: (el, id, isMe, isPinned) => {
-                // Desktop Right Click
-                el.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    chat.openMenu(e.clientX, e.clientY, id, isMe, isPinned);
-                });
-
-                // Mobile Long Press
-                el.addEventListener('touchstart', (e) => {
-                    state.longPressTimer = setTimeout(() => {
-                        if(navigator.vibrate) navigator.vibrate(50);
-                        const touch = e.touches[0];
-                        chat.openMenu(touch.clientX, touch.clientY, id, isMe, isPinned);
-                    }, 500);
-                }, {passive: true});
-
-                el.addEventListener('touchend', () => clearTimeout(state.longPressTimer));
-                el.addEventListener('touchmove', () => clearTimeout(state.longPressTimer));
-            },
-
-            openMenu: (x, y, id, isMe, isPinned) => {
-                state.ctxMsgId = id;
-                const menu = document.getElementById('ctx-menu');
+                // Long press / Right click
+                row.oncontextmenu = (e) => logic.openCtx(e, id, isMe, d.pinned);
                 
-                // Logic
-                const delBtn = document.getElementById('ctx-del');
-                const pinBtn = document.getElementById('ctx-pin');
-                
-                delBtn.style.display = (isMe || state.user.isAdmin) ? 'flex' : 'none';
-                pinBtn.style.display = state.user.isAdmin ? 'flex' : 'none';
-                pinBtn.innerHTML = isPinned ? '<i class="fas fa-thumbtack" style="width:20px;"></i> Открепить' : '<i class="fas fa-thumbtack" style="width:20px;"></i> Закрепить';
+                // Мобильный Long Press
+                let timer;
+                row.ontouchstart = (e) => { timer = setTimeout(() => logic.openCtx(e.touches[0], id, isMe, d.pinned), 600); };
+                row.ontouchend = () => clearTimeout(timer);
 
-                // Positioning
-                const w = window.innerWidth;
-                const h = window.innerHeight;
-                if(x + 220 > w) x = w - 230;
-                if(y + 200 > h) y = h - 210;
-
-                menu.style.left = x + 'px';
-                menu.style.top = y + 'px';
-                menu.style.display = 'block';
-
-                // Click outside to close
-                setTimeout(() => {
-                    document.addEventListener('click', function close(e) {
-                        if(!menu.contains(e.target)) {
-                            menu.style.display = 'none';
-                            document.removeEventListener('click', close);
-                        }
-                    }, {once:true});
-                }, 100);
+                flow.appendChild(row);
             },
 
-            triggerReply: () => {
-                const row = document.getElementById(`msg-${state.ctxMsgId}`);
-                const data = JSON.parse(row.dataset.raw);
-                
-                state.replyTo = {
-                    id: state.ctxMsgId,
-                    u: data.u,
-                    c: data.c,
-                    t: data.t
-                };
+            sendText: async () => {
+                const inp = document.getElementById('msg-input');
+                const val = inp.value.trim();
+                if (!val) return;
 
-                document.getElementById('reply-preview').style.display = 'flex';
-                document.getElementById('reply-target-name').innerText = data.u;
-                document.getElementById('reply-target-text').innerText = data.t === 'text' ? data.c : '[Картинка]';
-                document.getElementById('msg-input').focus();
-                document.getElementById('ctx-menu').style.display = 'none';
-            },
-
-            cancelReply: () => {
-                state.replyTo = null;
-                document.getElementById('reply-preview').style.display = 'none';
-            },
-
-            deleteMsg: async () => {
-                if(!confirm("Удалить навсегда?")) return;
-                await db.collection('msgs').doc(state.ctxMsgId).update({deleted: true});
-                ui.toast("Сообщение удалено");
-                document.getElementById('ctx-menu').style.display = 'none';
-            },
-
-            copyText: () => {
-                 const row = document.getElementById(`msg-${state.ctxMsgId}`);
-                 const data = JSON.parse(row.dataset.raw);
-                 if(data.t === 'text') {
-                     navigator.clipboard.writeText(data.c);
-                     ui.toast("Текст скопирован");
-                 }
-                 document.getElementById('ctx-menu').style.display = 'none';
-            },
-
-            send: async () => {
-                const field = document.getElementById('msg-input');
-                const txt = field.value.trim();
-                if(!txt) return;
-
-                const payload = {
-                    u: state.user.name,
-                    c: txt,
-                    t: 'text',
+                const msg = {
+                    author: user.name,
+                    author_uid: user.uid,
+                    body: val,
+                    type: 'text',
                     ts: firebase.firestore.FieldValue.serverTimestamp(),
-                    ava: state.user.ava,
-                    deleted: false,
-                    pinned: false
+                    reply: replyData
                 };
 
-                if(state.replyTo) {
-                    payload.reply = state.replyTo;
-                    chat.cancelReply();
-                }
-
-                field.value = '';
-                chat.checkInput(); // resize
-                
-                try {
-                    await db.collection('msgs').add(payload);
-                    // Sound effect could go here
-                } catch(e) {
-                    ui.toast("Ошибка отправки", "error");
-                }
+                inp.value = '';
+                ui.autoResize(inp);
+                logic.cancelReply();
+                await db.collection('vault_msgs').add(msg);
             },
 
-            sendFile: (input) => {
+            sendMedia: (input) => {
                 const file = input.files[0];
-                if(!file) return;
-                
+                if (!file) return;
                 const reader = new FileReader();
                 reader.onload = async (e) => {
-                    // In real app, upload to Firebase Storage. 
-                    // Here using Base64 for simplicity as requested "single file".
-                    const base64 = e.target.result;
-                    await db.collection('msgs').add({
-                        u: state.user.name,
-                        c: base64,
-                        t: 'img',
-                        ts: firebase.firestore.FieldValue.serverTimestamp(),
-                        ava: state.user.ava
+                    await db.collection('vault_msgs').add({
+                        author: user.name,
+                        author_uid: user.uid,
+                        body: e.target.result,
+                        type: 'img',
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 };
                 reader.readAsDataURL(file);
             },
 
-            checkInput: () => {
-                const el = document.getElementById('msg-input');
-                const btn = document.getElementById('send-btn');
-                el.style.height = 'auto';
-                el.style.height = el.scrollHeight + 'px';
-                if(el.value.trim().length > 0) btn.classList.remove('disabled');
-                else btn.classList.add('disabled');
-            },
-            
-            search: (query) => {
-                const rows = document.querySelectorAll('.msg-row');
-                query = query.toLowerCase();
-                rows.forEach(row => {
-                    const data = JSON.parse(row.dataset.raw || "{}");
-                    const txt = (data.c || "").toLowerCase();
-                    const user = (data.u || "").toLowerCase();
-                    if(txt.includes(query) || user.includes(query)) {
-                        row.classList.remove('hidden');
-                    } else {
-                        row.classList.add('hidden');
-                    }
+            // АДМИН-ЛОГИКА
+            listenAdminData: () => {
+                db.collection('vault_users').where('status', '==', 'pending').onSnapshot(snap => {
+                    document.getElementById('req-count').innerText = snap.size;
+                    if (activeTab === 'reqs') logic.renderAdmin();
                 });
             },
 
-            scrollToPinned: () => {
-                const id = document.getElementById('pinned-container').dataset.id;
-                const el = document.getElementById(`msg-${id}`);
-                if(el) {
-                    el.scrollIntoView({behavior:'smooth', block:'center'});
-                    el.querySelector('.bubble').style.animation = 'pulse-glow 1s';
-                } else {
-                    ui.toast("Сообщение слишком старое", "error");
-                }
-            }
-        };
-
-        // Attach Input Listener
-        document.getElementById('msg-input').addEventListener('input', chat.checkInput);
-
-        // --- PRESENCE SYSTEM ---
-        const presence = {
-            start: () => {
-                presence.beat();
-                setInterval(presence.beat, CONFIG.presenceInterval);
+            renderAdmin: async () => {
+                const container = document.getElementById('admin-content');
+                container.innerHTML = '<div style="padding:20px; text-align:center;">Загрузка...</div>';
                 
-                // Listen for stats
-                db.collection('users').where('online', '==', true).onSnapshot(snap => {
-                    let count = 0;
-                    const now = Date.now();
-                    snap.forEach(d => {
-                        const t = d.data().lastSeen;
-                        if(t && (now - t.toMillis() < CONFIG.presenceInterval * 2.5)) count++;
-                    });
-                    document.getElementById('online-stat').innerText = `${count} в сети`;
-                    document.querySelector('.status-indicator').style.background = count > 0 ? 'var(--success)' : 'gray';
-                });
-            },
-            beat: () => {
-                if(!state.user) return;
-                db.collection('users').doc(state.user.id).set({
-                    name: state.user.name,
-                    online: true,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                }, {merge: true});
-            }
-        };
-
-        // --- ADMIN SYSTEM ---
-        const admin = {
-            panel: () => {
-                alert("Админ-панель: \n1. Логи системы (Console)\n2. Управление пользователями\n\n(В разработке)");
-            },
-            
-            triggerPin: async () => {
-                const id = state.ctxMsgId;
-                const row = document.getElementById(`msg-${id}`);
-                const data = JSON.parse(row.dataset.raw);
-                const isPinned = data.pinned || false;
-
-                if(!isPinned) {
-                    // Set global pin
-                    await db.collection('settings').doc('global_pin').set({
-                        id: id,
-                        u: data.u,
-                        c: data.c,
-                        t: data.t
-                    });
-                    await db.collection('msgs').doc(id).update({pinned: true});
-                    ui.toast("Сообщение закреплено");
-                } else {
-                    await db.collection('settings').doc('global_pin').delete();
-                    await db.collection('msgs').doc(id).update({pinned: false});
-                    ui.toast("Сообщение откреплено");
-                }
-                document.getElementById('ctx-menu').style.display = 'none';
-            },
-
-            unpin: async (e) => {
-                e.stopPropagation();
-                if(!state.user.isAdmin) return ui.toast("Только Админ может убирать закреп", "error");
-                await db.collection('settings').doc('global_pin').delete();
-            },
-
-            listenPinned: () => {
-                db.collection('settings').doc('global_pin').onSnapshot(doc => {
-                    const el = document.getElementById('pinned-container');
-                    if(doc.exists) {
+                if (activeTab === 'reqs') {
+                    const snap = await db.collection('vault_users').where('status', '==', 'pending').get();
+                    container.innerHTML = '';
+                    if (snap.empty) container.innerHTML = '<p style="text-align:center; margin-top:20px; color:gray;">Новых заявок нет</p>';
+                    snap.forEach(doc => {
                         const d = doc.data();
-                        el.style.display = 'flex';
-                        el.dataset.id = d.id;
-                        document.getElementById('pinned-body').innerText = d.t === 'text' ? d.c : '[Изображение]';
+                        container.innerHTML += `
+                            <div class="request-card">
+                                <img src="${d.ava}" style="width:40px; height:40px; border-radius:50%;">
+                                <div class="req-info">
+                                    <b>${d.name}</b><br><small>${d.uid}</small>
+                                </div>
+                                <div class="req-actions">
+                                    <button class="btn-approve" onclick="logic.updateUserStatus('${d.uid}', 'approved')">Одобрить</button>
+                                    <button class="btn-ban" onclick="logic.updateUserStatus('${d.uid}', 'banned')">В Бан</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    const snap = await db.collection('vault_users').where('status', '==', 'approved').get();
+                    container.innerHTML = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        container.innerHTML += `
+                            <div class="request-card">
+                                <img src="${d.ava}" style="width:40px; height:40px; border-radius:50%;">
+                                <div class="req-info">
+                                    <b>${d.name}</b> ${d.uid === user.uid ? '(Вы)' : ''}
+                                </div>
+                                ${d.uid !== user.uid ? `<button class="btn-ban" onclick="logic.updateUserStatus('${d.uid}', 'banned')">Удалить</button>` : ''}
+                            </div>
+                        `;
+                    });
+                }
+            },
+
+            updateUserStatus: async (uid, status) => {
+                await db.collection('vault_users').doc(uid).update({ status });
+                logic.renderAdmin();
+                ui.toast(status === 'approved' ? "Доступ разрешен" : "Пользователь заблокирован");
+            },
+
+            // КОНТЕКСТНЫЕ ДЕЙСТВИЯ
+            openCtx: (e, id, isMe, isPinned) => {
+                e.preventDefault?.();
+                currentCtxId = id;
+                const menu = document.getElementById('ctx-menu');
+                menu.style.display = 'block';
+                menu.style.left = e.clientX + 'px';
+                menu.style.top = e.clientY + 'px';
+
+                document.getElementById('ctx-del-btn').style.display = (isMe || user.isAdmin) ? 'flex' : 'none';
+                document.getElementById('ctx-pin-btn').style.display = user.isAdmin ? 'flex' : 'none';
+                document.getElementById('ctx-pin-btn').innerHTML = isPinned ? '<i class="fas fa-times"></i> Открепить' : '<i class="fas fa-thumbtack"></i> Закрепить';
+
+                setTimeout(() => document.onclick = () => { menu.style.display = 'none'; document.onclick = null; }, 100);
+            },
+
+            ctxReply: async () => {
+                const doc = await db.collection('vault_msgs').doc(currentCtxId).get();
+                const d = doc.data();
+                replyData = { name: d.author, text: d.type === 'text' ? d.body : '[Медиа]' };
+                document.getElementById('reply-box').style.display = 'block';
+                document.getElementById('reply-name').innerText = d.author;
+                document.getElementById('reply-text').innerText = replyData.text;
+                document.getElementById('msg-input').focus();
+            },
+
+            cancelReply: () => {
+                replyData = null;
+                document.getElementById('reply-box').style.display = 'none';
+            },
+
+            ctxPin: async () => {
+                const docRef = db.collection('vault_msgs').doc(currentCtxId);
+                const doc = await docRef.get();
+                const nowPinned = !doc.data().pinned;
+                
+                await docRef.update({ pinned: nowPinned });
+                if (nowPinned) {
+                    await db.collection('vault_settings').doc('pin').set({ 
+                        id: currentCtxId, 
+                        author: doc.data().author, 
+                        body: doc.data().body 
+                    });
+                } else {
+                    await db.collection('vault_settings').doc('pin').delete();
+                }
+            },
+
+            listenPins: () => {
+                db.collection('vault_settings').doc('pin').onSnapshot(doc => {
+                    const bar = document.getElementById('pin-bar');
+                    if (doc.exists) {
+                        bar.style.display = 'flex';
+                        document.getElementById('pin-txt').innerText = `${doc.data().author}: ${doc.data().body}`;
+                        bar.dataset.id = doc.data().id;
                     } else {
-                        el.style.display = 'none';
+                        bar.style.display = 'none';
                     }
                 });
+            },
+
+            jumpToPin: () => {
+                const id = document.getElementById('pin-bar').dataset.id;
+                document.getElementById('msg-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            },
+
+            ctxDelete: async () => {
+                if (confirm("Удалить это сообщение для всех?")) {
+                    await db.collection('vault_msgs').doc(currentCtxId).delete();
+                }
+            },
+
+            updatePresence: () => {
+                if (user) db.collection('vault_users').doc(user.uid).update({ lastSeen: Date.now() });
+            },
+
+            listenPresence: () => {
+                db.collection('vault_users').onSnapshot(snap => {
+                    let count = 0;
+                    const threshold = Date.now() - 60000;
+                    snap.forEach(d => { if (d.data().lastSeen > threshold && d.data().status === 'approved') count++; });
+                    document.getElementById('online-count').innerText = `${count} в сети`;
+                });
+            },
+
+            logout: () => {
+                localStorage.removeItem('vault_user');
+                location.reload();
             }
         };
 
-        // --- HELPER FOR AUTH AVATAR ---
-        function previewAuth(input) {
-            if(input.files && input.files[0]) {
-                const r = new FileReader();
-                r.onload = (e) => document.getElementById('auth-preview').src = e.target.result;
-                r.readAsDataURL(input.files[0]);
-            }
-        }
-        function checkAdmin(val) {
-            const grp = document.getElementById('pass-group');
-            grp.style.display = (val.toLowerCase() === CONFIG.adminName.toLowerCase()) ? 'block' : 'none';
-        }
-
-        // --- INIT ---
-        window.onload = app.init;
+        window.onload = logic.init;
 
     </script>
 </body>
